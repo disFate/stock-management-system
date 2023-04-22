@@ -1,4 +1,4 @@
-import views.*;
+import java.io.IOException;
 
 /**
  * @Author: Tsuna
@@ -7,26 +7,7 @@ import views.*;
  */
 public class StockManagementSystem {
 
-    public static void main(String[] args) {
-        // Create and display the LoginView
-        LoginView loginView = new LoginView();
-        loginView.setVisible(true);
-        // Uncomment the following lines to test other views
-        /*
-        RegisterView registerView = new RegisterView();
-        registerView.setVisible(true);
+    public static void main(String[] args) throws IOException {
 
-        PortfolioView portfolioView = new PortfolioView();
-        portfolioView.setVisible(true);
-
-        StockView stockView = new StockView();
-        stockView.setVisible(true);
-
-        TradeView tradeView = new TradeView();
-        tradeView.setVisible(true);
-
-        UserView userView = new UserView();
-        userView.setVisible(true);
-        */
     }
 }
