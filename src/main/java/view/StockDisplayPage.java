@@ -26,10 +26,11 @@ public class StockDisplayPage extends JFrame {
     private JScrollPane scrollPane;
     private DefaultTableModel tableModel;
 
-    public StockDisplayPage(StockController stockController) {
+    public StockDisplayPage(StockController stockController, UserMenuPage userMenuPage) {
         setTitle("market stocks");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         mainPanel = new JPanel();
         setContentPane(mainPanel);
@@ -58,8 +59,13 @@ public class StockDisplayPage extends JFrame {
         buyButton = new JButton("buy");
         bottomPanel.add(buyButton, BorderLayout.EAST);
 
-        // todo Add ActionListener to backButton
-
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                userMenuPage.setVisible(true);
+                setVisible(false);
+            }
+        });
         // Add ActionListener to buyButton
         buyButton.addActionListener(new ActionListener() {
             @Override
@@ -70,6 +76,7 @@ public class StockDisplayPage extends JFrame {
                     int stockId = (int) stockTable.getValueAt(selectedRow, 0);
                     int quantity = 1;// 获取购买数量，可以通过弹出窗口或其他方式让用户输入
                     stockController.buyStock(stockId, quantity);
+                    loadData(stockController);
                 } else {
                     JOptionPane.showMessageDialog(null, "please select a stock");
                 }
@@ -77,11 +84,25 @@ public class StockDisplayPage extends JFrame {
         });
     }
 
+    public void loadData(StockController stockController) {
+        // 清除表格中的现有数据
+        tableModel.setRowCount(0);
+
+        // 从数据库或其他数据源中加载新数据
+        List<Stock> stocks = stockController.getAllStocks(); // 以实际数据加载方法替换
+
+        // 将新数据添加到表格模型中
+        for (Stock stock : stocks) {
+            tableModel.addRow(new Object[]{stock.getSymbol(), stock.getName(), stock.getPrice()});
+        }
+    }
+
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             IStockDAO stockDAO = new StockDAOImpl();
             StockController stockController = new StockController(stockDAO);
-            new StockDisplayPage(stockController).setVisible(true);
+            new StockDisplayPage(stockController, new UserMenuPage(new StockController(new StockDAOImpl()))).setVisible(true);
         });
     }
 }

@@ -26,10 +26,11 @@ public class UserStockPage extends JFrame {
     private JScrollPane scrollPane;
     private DefaultTableModel tableModel;
 
-    public UserStockPage(StockController stockController) {
+    public UserStockPage(StockController stockController, UserMenuPage userMenuPage) {
         setTitle("user stocks");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         mainPanel = new JPanel();
         setContentPane(mainPanel);
@@ -58,8 +59,13 @@ public class UserStockPage extends JFrame {
         sellButton = new JButton("sell");
         bottomPanel.add(sellButton, BorderLayout.EAST);
 
-        // todo Add ActionListener to backButton
-
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                userMenuPage.setVisible(true);
+                setVisible(false);
+            }
+        });
         // Add ActionListener to sellButton
         sellButton.addActionListener(new ActionListener() {
             @Override
@@ -70,17 +76,32 @@ public class UserStockPage extends JFrame {
                     String symbol = (String) userStockTable.getValueAt(selectedRow, 0);
                     int quantity = 1;// 获取出售数量，可以通过弹出窗口或其他方式让用户输入
                     stockController.sellStock(symbol, quantity);
+                    loadData(stockController);
                 } else {
                     JOptionPane.showMessageDialog(null, "please select a stock");
                 }
             }
         });
     }
+
+    public void loadData(StockController stockController) {
+        // 清除表格中的现有数据
+        tableModel.setRowCount(0);
+
+        // 从数据库或其他数据源中加载新数据
+        List<Stock> userStocks = stockController.getUserStocks();
+
+        // 将新数据添加到表格模型中
+        for (Stock stock : userStocks) {
+            Object[] rowData = {stock.getSymbol(), stock.getName(), stock.getPrice(), stock.getAmount()};
+            tableModel.addRow(rowData);
+        }
+    }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             IStockDAO stockDAO = new StockDAOImpl();
             StockController stockController = new StockController(stockDAO);
-            new UserStockPage(stockController).setVisible(true);
+            new UserStockPage(stockController, new UserMenuPage(new StockController(new StockDAOImpl()))).setVisible(true);
         });
     }
 }

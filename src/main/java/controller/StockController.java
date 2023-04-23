@@ -39,6 +39,7 @@ public class StockController {
         }
         try {
             stockDAO.buyStock(currentUser.getId(), stockId, quantity);
+            //todo buy logic: check money and reduce money
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -51,6 +52,7 @@ public class StockController {
         }
         try {
             stockDAO.sellStock(currentUser.getId(), symbol, quantity);
+            //todo add money
         } catch (SQLException e) {
             e.printStackTrace();
         }

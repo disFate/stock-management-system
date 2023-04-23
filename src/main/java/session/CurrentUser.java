@@ -11,9 +11,8 @@ public class CurrentUser {
     private User currentUser;
 
     public CurrentUser() {
-        this.currentUser = new User();
+        this.currentUser = new User(2, "dong","123");
         // todo find a way to really restore the current user info
-        currentUser.setId(2);
     }
 
     public User getCurrentUser() {
