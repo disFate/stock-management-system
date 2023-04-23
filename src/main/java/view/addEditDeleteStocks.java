@@ -88,7 +88,40 @@ public class addEditDeleteStocks extends JFrame{
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //implement add function
+
+                JPanel panel = new JPanel(new GridLayout(4, 2, 5, 5));
+                panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+                JLabel symbolLabel = new JLabel("Symbol:");
+                JTextField symbolField = new JTextField();
+                JLabel companyLabel = new JLabel("Company:");
+                JTextField companyField = new JTextField();
+                JLabel priceLabel = new JLabel("Price:");
+                JTextField priceField = new JTextField();
+                JLabel amountLabel = new JLabel("Amount:");
+                JTextField amountField = new JTextField();
+
+                panel.add(symbolLabel);
+                panel.add(symbolField);
+                panel.add(companyLabel);
+                panel.add(companyField);
+                panel.add(priceLabel);
+                panel.add(priceField);
+                panel.add(amountLabel);
+                panel.add(amountField);
+
+                int result = JOptionPane.showConfirmDialog(null, panel, "Add Stock",
+                        JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+                if (result == JOptionPane.OK_OPTION) {
+                    // get the values entered by the user
+                    String symbol = symbolField.getText();
+                    String company = companyField.getText();
+                    double price = Double.parseDouble(priceField.getText());
+                    int amount = Integer.parseInt(amountField.getText());
+
+                    // TODO: add the stock to the list
+                }
             }
         });
 
