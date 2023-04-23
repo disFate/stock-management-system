@@ -56,6 +56,7 @@ src
 │       ├── LoginPage.java
 │       ├── StockPage.java
 │       └── UserStockPage.java
+│       └── UserMenuPage.java
 └── resources
     └── database.properties
 ```
@@ -84,12 +85,10 @@ src
 
 - Display all available stocks in `StockPage`
 - Display user-owned stocks in `UserStockPage`
-- Buy stocks from `StockPage`
-- Sell stocks from `UserStockPage`
+- Buy stocks from `StockPage`, Sell stocks from `UserStockPage`, refresh page after transaction(but can check in database)
+- Select options from 'UserMenuPage', jump to other pages by clicking button
 
 ## Not Implemented Features
-
-- refresh page after buying(but can check in database)
 - user login and record status in Session
 - user register
 
