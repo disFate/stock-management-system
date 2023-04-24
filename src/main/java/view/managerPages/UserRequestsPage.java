@@ -89,7 +89,7 @@ public class UserRequestsPage extends JFrame {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             IStockDAO stockDAO = new StockDAOImpl();
-            UserController userController = new UserController(new UserDAOImpl(), new TransactionDAOImpl());
+            UserController userController = new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl());
             new UserRequestsPage(userController).setVisible(true);
         });
     }

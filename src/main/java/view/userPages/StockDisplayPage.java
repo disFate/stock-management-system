@@ -20,6 +20,7 @@ import java.util.List;
 
 public class StockDisplayPage extends JFrame {
 
+    List<Stock> stocks;
     private JPanel mainPanel;
     private JTable stockTable;
     private JButton backButton;
@@ -42,7 +43,7 @@ public class StockDisplayPage extends JFrame {
         stockTable = new JTable(tableModel);
         stockTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        List<Stock> stocks = stockController.getAllStocks();
+        stocks = stockController.getAllStocks();
         for (Stock stock : stocks) {
             Object[] rowData = {stock.getSymbol(), stock.getName(), stock.getPrice(), stock.getAmount()};
             tableModel.addRow(rowData);
@@ -79,13 +80,19 @@ public class StockDisplayPage extends JFrame {
                     Stock stock = stocks.stream().filter(s -> s.getSymbol().equals(stockTable.
                             getValueAt(selectedRow, 0))).findFirst().orElse(null);
                     try {
-                        userController.buyStock(stock, quantity);
+                        if (userController.buyStock(stock, quantity).isSuccess() == true) {
+                            tableModel.setValueAt(stock.getAmount(), selectedRow, 3);
+                            tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
+                            Thread thread = new Thread(() -> {
+                                userMenuPage.notifyUpdate(1, stockController);
+                            });
+                            thread.start();
+                        }
                     } catch (SQLException ex) {
                         throw new RuntimeException(ex);
                     }
-                    loadData(stockController);
                 } else {
-                    JOptionPane.showMessageDialog(null, "please select a stock");
+                    JOptionPane.showMessageDialog(null, "please xselect a stock");
                 }
             }
         });
@@ -93,7 +100,7 @@ public class StockDisplayPage extends JFrame {
 
     public void loadData(StockController stockController) {
         tableModel.setRowCount(0);
-        List<Stock> stocks = stockController.getAllStocks();
+        stocks = stockController.getAllStocks();
         for (Stock stock : stocks) {
             tableModel.addRow(new Object[]{stock.getSymbol(), stock.getName(), stock.getPrice(), stock.getAmount()});
         }

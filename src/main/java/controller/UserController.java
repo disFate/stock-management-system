@@ -1,6 +1,7 @@
 package controller;
 
 import common.Response;
+import dao.IStockDAO;
 import dao.ITransactionDAO;
 import dao.IUserDAO;
 import model.Stock;
@@ -15,10 +16,12 @@ import java.time.LocalDateTime;
 public class UserController {
     IUserDAO userDAO;
     ITransactionDAO transactionDAO;
+    IStockDAO stockDAO;
 
-    public UserController(IUserDAO userDAO, ITransactionDAO transactionDAO) {
+    public UserController(IUserDAO userDAO, ITransactionDAO transactionDAO, IStockDAO stockDAO) {
         this.userDAO = userDAO;
         this.transactionDAO = transactionDAO;
+        this.stockDAO = stockDAO;
     }
 
     public Response buyStock(Stock stock, int buyQuantity) throws SQLException {
@@ -35,9 +38,10 @@ public class UserController {
             return new Response(false, "only " + stock.getAmount() + " left in market");
         }
         currentUser.setBalance(currentUser.getBalance().subtract(totalCost));
-        userDAO.updateUser(currentUser.getId(), currentUser);
-        userDAO.buyStock(currentUser.getId(), stock, buyQuantity);
-        //todo reduce amount in market
+        stock.setAmount(stock.getAmount() - buyQuantity);
+        userDAO.updateBalance(currentUser.getId(), currentUser);
+        userDAO.updateStock(currentUser.getId(), stock.getId(), buyQuantity, Transaction.Type.BUY);
+        stockDAO.updateAmount(stock.getId(), buyQuantity, Transaction.Type.BUY);
         transactionDAO.addTransaction(new Transaction(
                 0,
                 currentUser.getId(),
@@ -61,8 +65,9 @@ public class UserController {
 
         BigDecimal totalIncome = BigDecimal.valueOf(stock.getPrice() * sellQuantity);
         currentUser.setBalance(currentUser.getBalance().add(totalIncome));
-        userDAO.sellStock(currentUser.getId(), stock, sellQuantity);
-        //todo add stock amount in market
+        stock.setAmount(stock.getAmount() - sellQuantity);
+        userDAO.updateStock(currentUser.getId(), stock.getId(), sellQuantity, Transaction.Type.SELL);
+        stockDAO.updateAmount(stock.getId(), sellQuantity, Transaction.Type.SELL);
         transactionDAO.addTransaction(new Transaction(0,
                 new CurrentUser().getCurrentUser().getId(),
                 stock.getId(),

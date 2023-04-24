@@ -1,11 +1,14 @@
 package dao.impl;
 
-import dao.DatabaseConfig;
+import DataSource.DatabaseConfig;
+import DataSource.DatabaseConnectionPool;
 import dao.IUserDAO;
-import model.Stock;
+import model.Transaction;
 import model.User;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * @Author: Tsuna
@@ -16,56 +19,68 @@ public class UserDAOImpl implements IUserDAO {
     DatabaseConfig databaseConfig = DatabaseConfig.getInstance();
 
     @Override
-    public void buyStock(int userId, Stock stock, int quantity) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(
-                databaseConfig.getDbUrl(),
-                databaseConfig.getDbUsername(),
-                databaseConfig.getDbPassword())) {
-
-            String insertOrUpdateQuery = "INSERT INTO user_stocks (user_id, stock_id, quantity) " +
+    public void updateStock(int userId, int stockId, int transactionQuantity, Transaction.Type type) throws SQLException {
+        String sql;
+        if (type.equals(Transaction.Type.BUY)) {
+            sql = "INSERT INTO user_stocks (user_id, stock_id, quantity) " +
                     "VALUES (?, ?, ?) " +
                     "ON DUPLICATE KEY UPDATE quantity = quantity + ?";
-            PreparedStatement statement = connection.prepareStatement(insertOrUpdateQuery);
-            statement.setInt(1, userId);
-            statement.setInt(2, stock.getId());
-            statement.setInt(3, quantity);
-            statement.setInt(4, quantity);
-            statement.executeUpdate();
-        }
-    }
+            try (Connection connection = DatabaseConnectionPool.getConnection();
+                 PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, userId);
+                statement.setInt(2, stockId);
+                statement.setInt(3, transactionQuantity);
+                statement.setInt(4, transactionQuantity);
+                statement.executeUpdate();
 
-    @Override
-    public void sellStock(int userId, Stock stock, int buyQuantity) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(
-                databaseConfig.getDbUrl(),
-                databaseConfig.getDbUsername(),
-                databaseConfig.getDbPassword())) {
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-            // 首先，根据符号获取股票ID
-            String selectStockIdQuery = "SELECT id FROM stocks WHERE symbol = ?";
-            PreparedStatement selectStatement = connection.prepareStatement(selectStockIdQuery);
-            selectStatement.setString(1, stock.getSymbol());
-            ResultSet resultSet = selectStatement.executeQuery();
-            if (resultSet.next()) {
-                int stockId = resultSet.getInt("id");
-
-                // 使用获取到的股票ID进行更新
-                String updateQuery = "UPDATE user_stocks SET quantity = quantity - ? " +
-                        "WHERE user_id = ? AND stock_id = ?";
-                PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
-                updateStatement.setInt(1, buyQuantity);
-                updateStatement.setInt(2, userId);
-                updateStatement.setInt(3, stockId);
-                updateStatement.executeUpdate();
-            } else {
-                throw new SQLException("can't find the stock：" + stock.getSymbol());
+        } else {
+            sql = "UPDATE user_stocks SET quantity = quantity - ? where user_id = ?" +
+                    " and stock_id = ?";
+            try (Connection connection = DatabaseConnectionPool.getConnection();
+                 PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, transactionQuantity);
+                statement.setInt(2, userId);
+                statement.setInt(3, stockId);
+                statement.executeUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
+
+
     }
+//
+//    @Override
+//    public void sellStock(int userId, Stock stock, int buyQuantity) throws SQLException {
+//        String sql = "UPDATE user_stocks SET quantity = quantity - ? " +
+//                "WHERE user_id = ? AND stock_id = ?";
+//        try (Connection connection = DatabaseConnectionPool.getConnection();
+//             PreparedStatement updateStatement = connection.prepareStatement(sql);) {
+//            int stockId = stock.getId();
+//            updateStatement.setInt(1, buyQuantity);
+//            updateStatement.setInt(2, userId);
+//            updateStatement.setInt(3, stockId);
+//            updateStatement.executeUpdate();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @Override
-    public void updateUser(int userId, User user) {
-
+    public void updateBalance(int userId, User user) {
+        String sql = "UPDATE users SET balance = ? where id = ?";
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement updateStatement = connection.prepareStatement(sql);) {
+            updateStatement.setBigDecimal(1, user.getBalance());
+            updateStatement.setInt(2, userId);
+            updateStatement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

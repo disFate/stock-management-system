@@ -14,8 +14,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class UserMenuPage extends JFrame {
-    private StockDisplayPage stockPage;
-    private UserStockPage userStockPage;
+    private StockDisplayPage stockPage;//0
+    private UserStockPage userStockPage;//1
 
     public UserMenuPage(StockController stockController, UserController userController) {
         stockPage = new StockDisplayPage(stockController, userController, this);
@@ -83,9 +83,18 @@ public class UserMenuPage extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                UserMenuPage userMenuPage = new UserMenuPage(new StockController(new StockDAOImpl(), new TransactionDAOImpl()), new UserController(new UserDAOImpl(), new TransactionDAOImpl()));
+                UserMenuPage userMenuPage = new UserMenuPage(new StockController(new StockDAOImpl(), new TransactionDAOImpl()), new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl()));
                 userMenuPage.setVisible(true);
             }
         });
+    }
+
+    public void notifyUpdate(int page, StockController stockController) {
+        if (page == 0) {
+            stockPage.loadData(stockController);
+        }
+        if (page == 1) {
+            userStockPage.loadData(stockController);
+        }
     }
 }

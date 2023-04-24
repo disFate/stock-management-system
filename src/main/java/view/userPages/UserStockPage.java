@@ -6,6 +6,7 @@ package view.userPages;
  * @Description:
  */
 
+import common.Response;
 import controller.StockController;
 import controller.UserController;
 import model.Stock;
@@ -20,6 +21,7 @@ import java.util.List;
 
 public class UserStockPage extends JFrame {
 
+    List<Stock> userStocks;
     private JPanel mainPanel;
     private JTable userStockTable;
     private JButton backButton;
@@ -42,7 +44,7 @@ public class UserStockPage extends JFrame {
         userStockTable = new JTable(tableModel);
         userStockTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        List<Stock> userStocks = stockController.getUserStocks();
+        userStocks = stockController.getUserStocks();
         for (Stock stock : userStocks) {
             Object[] rowData = {stock.getSymbol(), stock.getName(), stock.getPrice(), stock.getAmount()};
             tableModel.addRow(rowData);
@@ -78,27 +80,37 @@ public class UserStockPage extends JFrame {
                             getValueAt(selectedRow, 0))).findFirst().orElse(null);
                     //todo a pop up window to select quantity
                     int quantity = 1;
+
+                    // Time the database operation
+                    //long dbStartTime = System.nanoTime();
                     try {
-                        userController.sellStock(stock, quantity);
+                        Response res = userController.sellStock(stock, quantity);
+                        if (res.isSuccess() == true) {
+                            tableModel.setValueAt(stock.getAmount(), selectedRow, 3);
+                            tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
+                            Thread thread = new Thread(() -> {
+                                userMenuPage.notifyUpdate(0, stockController);
+                            });
+                            thread.start();
+
+                        } else {
+                            System.out.println(res.getMessage());
+                        }
                     } catch (SQLException ex) {
                         throw new RuntimeException(ex);
                     }
-                    loadData(stockController);
+
                 } else {
                     JOptionPane.showMessageDialog(null, "please select a stock");
                 }
             }
         });
+
     }
 
     public void loadData(StockController stockController) {
-        // 清除表格中的现有数据
         tableModel.setRowCount(0);
-
-        // 从数据库或其他数据源中加载新数据
-        List<Stock> userStocks = stockController.getUserStocks();
-
-        // 将新数据添加到表格模型中
+        userStocks = stockController.getUserStocks();
         for (Stock stock : userStocks) {
             Object[] rowData = {stock.getSymbol(), stock.getName(), stock.getPrice(), stock.getAmount()};
             tableModel.addRow(rowData);

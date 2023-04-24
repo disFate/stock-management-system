@@ -7,6 +7,7 @@ package dao;
  */
 
 import model.Stock;
+import model.Transaction;
 
 import java.util.List;
 
@@ -14,4 +15,6 @@ public interface IStockDAO {
     List<Stock> getAllStocks();
 
     List<Stock> getUserStocks(int userId);
+
+    void updateAmount(int stockId, int transactionAmount, Transaction.Type transactionType);
 }

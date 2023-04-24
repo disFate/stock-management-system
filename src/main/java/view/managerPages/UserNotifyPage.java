@@ -1,6 +1,7 @@
 package view.managerPages;
 
 import controller.UserController;
+import dao.impl.StockDAOImpl;
 import dao.impl.TransactionDAOImpl;
 import dao.impl.UserDAOImpl;
 
@@ -61,7 +62,7 @@ public class UserNotifyPage extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            UserController userController = new UserController(new UserDAOImpl(), new TransactionDAOImpl());
+            UserController userController = new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl());
             new UserNotifyPage(userController).setVisible(true);
         });
     }

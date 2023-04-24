@@ -6,12 +6,16 @@ package dao.impl;
  * @Description:
  */
 
-import dao.DatabaseConfig;
+import DataSource.DatabaseConfig;
+import DataSource.DatabaseConnectionPool;
 import dao.ITransactionDAO;
 import model.Transaction;
 import model.User;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,15 +24,10 @@ public class TransactionDAOImpl implements ITransactionDAO {
 
     @Override
     public void addTransaction(Transaction transaction) {
-        try (Connection connection = DriverManager.getConnection(
-                databaseConfig.getDbUrl(),
-                databaseConfig.getDbUsername(),
-                databaseConfig.getDbPassword())) {
-            PreparedStatement preparedStatement = connection.prepareStatement(
-                    "INSERT INTO transactions (user_id, stock_id, type, quantity, price) VALUES (?, ?, ?, ?, ?)",
-                    Statement.RETURN_GENERATED_KEYS
-            );
-
+        String sql = "INSERT INTO transactions (user_id, stock_id, type, quantity, price) VALUES (?, ?, ?, ?, ?)";
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        ) {
             preparedStatement.setInt(1, transaction.getUserId());
             preparedStatement.setInt(2, transaction.getStockId());
             preparedStatement.setString(3, transaction.getType().toString());
@@ -44,14 +43,9 @@ public class TransactionDAOImpl implements ITransactionDAO {
     @Override
     public List<Transaction> getTransactionsByUser(User user) {
         List<Transaction> transactions = new ArrayList<>();
-        try (Connection connection = DriverManager.getConnection(
-                databaseConfig.getDbUrl(),
-                databaseConfig.getDbUsername(),
-                databaseConfig.getDbPassword())) {
-            PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT * FROM transactions WHERE user_id = ?"
-            );
-
+        String sql = "SELECT * FROM transactions WHERE user_id = ?";
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql);) {
             preparedStatement.setInt(1, user.getId());
 
             ResultSet resultSet = preparedStatement.executeQuery();

@@ -1,6 +1,6 @@
 package dao;
 
-import model.Stock;
+import model.Transaction;
 import model.User;
 
 import java.sql.SQLException;
@@ -12,9 +12,7 @@ import java.sql.SQLException;
  */
 public interface IUserDAO {
 
-    void buyStock(int userId, Stock stock, int quantity) throws SQLException;
+    void updateStock(int userId, int stockId, int transactionQuantity, Transaction.Type type) throws SQLException;
 
-    void sellStock(int userId, Stock stock, int quantity) throws SQLException;
-
-    void updateUser(int userId, User user);
+    void updateBalance(int userId, User user);
 }
