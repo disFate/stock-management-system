@@ -2,27 +2,23 @@
 
 This project is a Stock Portfolio Management system, which consists of two major subsystems: a portfolio management system and a customer stock trading system. The system is developed using Java Swing and follows the MVC architecture.
 
-## Schema
-
-```
-CREATE DATABASE stock_management_system;
-
-USE stock_management_system;
-
+## schema
+```sql
 CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(255) NOT NULL UNIQUE,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    first_name VARCHAR(255) NOT NULL,
-    last_name VARCHAR(255) NOT NULL
+    role ENUM('customer') NOT NULL,
+    approved BOOLEAN NOT NULL DEFAULT FALSE,
+    balance DECIMAL(10, 2) NOT NULL DEFAULT 0
 );
 
-CREATE TABLE stock (
-    stock_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE stocks (
+    id INT PRIMARY KEY AUTO_INCREMENT,
     symbol VARCHAR(10) NOT NULL UNIQUE,
     company_name VARCHAR(255) NOT NULL,
-    current_price DECIMAL(10, 2) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
     amount INT NOT NULL
 );
 
@@ -32,7 +28,19 @@ CREATE TABLE user_stocks (
     quantity INT NOT NULL,
     PRIMARY KEY (user_id, stock_id),
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (stock_id) REFERENCES stock(stock_id)
+    FOREIGN KEY (stock_id) REFERENCES stocks(id)
+);
+
+CREATE TABLE transactions (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    stock_id INT NOT NULL,
+    type ENUM('buy', 'sell') NOT NULL,
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    transaction_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (stock_id) REFERENCES stocks(id)
 );
 ```
 
@@ -52,11 +60,19 @@ src
 │   ├── model
 │   │   ├── Stock.java
 │   │   └── User.java
+│   ├── session
+│   │   └── CurrentUser.java
 │   └── view
-│       ├── LoginPage.java
-│       ├── StockPage.java
-│       └── UserStockPage.java
-│       └── UserMenuPage.java
+│       ├── managerPages
+│           ├── addEdotDeleteStocks.java
+│           ├── ManagerFirstPage.java
+│           └── UserNotifyPage.java
+│           └── UserRequestsPage.java
+│       └── userPages
+│           ├── StockDisplayPage.java
+│           ├── UserMenuPage.java
+│           └── UserStockPage.java
+
 └── resources
     └── database.properties
 ```
