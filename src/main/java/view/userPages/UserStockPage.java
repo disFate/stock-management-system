@@ -1,13 +1,13 @@
-package view;
+package view.userPages;
 
 /**
  * @Author: Tsuna
  * @Date: 2023-04-21-15:28
  * @Description:
  */
+
 import controller.StockController;
-import dao.IStockDAO;
-import dao.impl.StockDAOImpl;
+import controller.UserController;
 import model.Stock;
 
 import javax.swing.*;
@@ -15,6 +15,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.List;
 
 public class UserStockPage extends JFrame {
@@ -26,7 +27,7 @@ public class UserStockPage extends JFrame {
     private JScrollPane scrollPane;
     private DefaultTableModel tableModel;
 
-    public UserStockPage(StockController stockController, UserMenuPage userMenuPage) {
+    public UserStockPage(StockController stockController, UserController userController, UserMenuPage userMenuPage) {
         setTitle("user stocks");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -73,9 +74,15 @@ public class UserStockPage extends JFrame {
                 int selectedRow = userStockTable.getSelectedRow();
                 if (selectedRow != -1) {
                     // Perform sell operation with the selected stock
-                    String symbol = (String) userStockTable.getValueAt(selectedRow, 0);
-                    int quantity = 1;// 获取出售数量，可以通过弹出窗口或其他方式让用户输入
-                    stockController.sellStock(symbol, quantity);
+                    Stock stock = userStocks.stream().filter(s -> s.getSymbol().equals(userStockTable.
+                            getValueAt(selectedRow, 0))).findFirst().orElse(null);
+                    //todo a pop up window to select quantity
+                    int quantity = 1;
+                    try {
+                        userController.sellStock(stock, quantity);
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
                     loadData(stockController);
                 } else {
                     JOptionPane.showMessageDialog(null, "please select a stock");
@@ -96,12 +103,5 @@ public class UserStockPage extends JFrame {
             Object[] rowData = {stock.getSymbol(), stock.getName(), stock.getPrice(), stock.getAmount()};
             tableModel.addRow(rowData);
         }
-    }
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            IStockDAO stockDAO = new StockDAOImpl();
-            StockController stockController = new StockController(stockDAO);
-            new UserStockPage(stockController, new UserMenuPage(new StockController(new StockDAOImpl()))).setVisible(true);
-        });
     }
 }

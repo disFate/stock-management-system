@@ -1,13 +1,13 @@
-package view;
+package view.userPages;
 
 /**
  * @Author: Tsuna
  * @Date: 2023-04-21-15:26
  * @Description:
  */
+
 import controller.StockController;
-import dao.IStockDAO;
-import dao.impl.StockDAOImpl;
+import controller.UserController;
 import model.Stock;
 
 import javax.swing.*;
@@ -15,6 +15,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.List;
 
 public class StockDisplayPage extends JFrame {
@@ -26,7 +27,7 @@ public class StockDisplayPage extends JFrame {
     private JScrollPane scrollPane;
     private DefaultTableModel tableModel;
 
-    public StockDisplayPage(StockController stockController, UserMenuPage userMenuPage) {
+    public StockDisplayPage(StockController stockController, UserController userController, UserMenuPage userMenuPage) {
         setTitle("market stocks");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -73,9 +74,15 @@ public class StockDisplayPage extends JFrame {
                 int selectedRow = stockTable.getSelectedRow();
                 if (selectedRow != -1) {
                     // Perform buy operation with the selected stock
-                    int stockId = (int) stockTable.getValueAt(selectedRow, 0);
-                    int quantity = 1;// 获取购买数量，可以通过弹出窗口或其他方式让用户输入
-                    stockController.buyStock(stockId, quantity);
+                    //todo pop up window to select quantity
+                    int quantity = 1;
+                    Stock stock = stocks.stream().filter(s -> s.getSymbol().equals(stockTable.
+                            getValueAt(selectedRow, 0))).findFirst().orElse(null);
+                    try {
+                        userController.buyStock(stock, quantity);
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
                     loadData(stockController);
                 } else {
                     JOptionPane.showMessageDialog(null, "please select a stock");
@@ -85,25 +92,11 @@ public class StockDisplayPage extends JFrame {
     }
 
     public void loadData(StockController stockController) {
-        // 清除表格中的现有数据
         tableModel.setRowCount(0);
-
-        // 从数据库或其他数据源中加载新数据
-        List<Stock> stocks = stockController.getAllStocks(); // 以实际数据加载方法替换
-
-        // 将新数据添加到表格模型中
+        List<Stock> stocks = stockController.getAllStocks();
         for (Stock stock : stocks) {
-            tableModel.addRow(new Object[]{stock.getSymbol(), stock.getName(), stock.getPrice()});
+            tableModel.addRow(new Object[]{stock.getSymbol(), stock.getName(), stock.getPrice(), stock.getAmount()});
         }
-    }
-
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            IStockDAO stockDAO = new StockDAOImpl();
-            StockController stockController = new StockController(stockDAO);
-            new StockDisplayPage(stockController, new UserMenuPage(new StockController(new StockDAOImpl()))).setVisible(true);
-        });
     }
 }
 

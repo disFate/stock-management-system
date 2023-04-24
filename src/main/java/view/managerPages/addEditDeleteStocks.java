@@ -1,8 +1,10 @@
-package view;
+package view.managerPages;
 
 import controller.StockController;
 import dao.IStockDAO;
+import dao.ITransactionDAO;
 import dao.impl.StockDAOImpl;
+import dao.impl.TransactionDAOImpl;
 import model.Stock;
 
 import javax.swing.*;
@@ -12,7 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class addEditDeleteStocks extends JFrame{
+public class addEditDeleteStocks extends JFrame {
     private JPanel mainPanel;
     private JTable stockTable;
     private JButton backButton;
@@ -21,6 +23,7 @@ public class addEditDeleteStocks extends JFrame{
     private JButton editButton;
     private JScrollPane scrollPane;
     private DefaultTableModel tableModel;
+
     public addEditDeleteStocks(StockController stockController) {
         setTitle("All Stocks");
         setSize(800, 600);
@@ -66,7 +69,7 @@ public class addEditDeleteStocks extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = stockTable.getSelectedRow();
                 if (selectedRow != -1) {
-                   //perform edit
+                    //perform edit
                 } else {
                     JOptionPane.showMessageDialog(null, "please select a stock");
                 }
@@ -126,15 +129,13 @@ public class addEditDeleteStocks extends JFrame{
         });
 
 
-
-
-
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             IStockDAO stockDAO = new StockDAOImpl();
-            StockController stockController = new StockController(stockDAO);
+            ITransactionDAO transactionDAO = new TransactionDAOImpl();
+            StockController stockController = new StockController(stockDAO, transactionDAO);
             new addEditDeleteStocks(stockController).setVisible(true);
         });
     }

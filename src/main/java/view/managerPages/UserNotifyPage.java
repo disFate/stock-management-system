@@ -1,19 +1,14 @@
-package view;
+package view.managerPages;
 
-import controller.StockController;
 import controller.UserController;
-import dao.IStockDAO;
-import dao.impl.StockDAOImpl;
-import model.Stock;
-import model.User;
+import dao.impl.TransactionDAOImpl;
+import dao.impl.UserDAOImpl;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
-public class UserNotifyPage extends JFrame{
+
+public class UserNotifyPage extends JFrame {
     private JPanel mainPanel;
     private JTable userTable;
     private JButton backButton;
@@ -25,7 +20,7 @@ public class UserNotifyPage extends JFrame{
     private DefaultTableModel tableModel;
 
 
-    public UserNotifyPage(UserController userController){
+    public UserNotifyPage(UserController userController) {
         setTitle("Users");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -56,7 +51,6 @@ public class UserNotifyPage extends JFrame{
         notifyButton = new JButton("notify");
 
 
-
         JTextField message = new JTextField();
         message.setColumns(40);
         buttonPanel.add(message);
@@ -64,9 +58,10 @@ public class UserNotifyPage extends JFrame{
         //TODO: add functionality to buttons
 
     }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            UserController userController = new UserController();
+            UserController userController = new UserController(new UserDAOImpl(), new TransactionDAOImpl());
             new UserNotifyPage(userController).setVisible(true);
         });
     }

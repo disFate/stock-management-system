@@ -1,20 +1,18 @@
-package view;
+package view.managerPages;
 
-import controller.StockController;
 import controller.UserController;
 import dao.IStockDAO;
 import dao.impl.StockDAOImpl;
-import model.Stock;
-import model.User;
+import dao.impl.TransactionDAOImpl;
+import dao.impl.UserDAOImpl;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
-public class UserRequestsPage extends JFrame{
+public class UserRequestsPage extends JFrame {
     private JPanel mainPanel;
     private JTable userTable;
     private JButton backButton;
@@ -25,7 +23,7 @@ public class UserRequestsPage extends JFrame{
     private DefaultTableModel tableModel;
 
 
-    public UserRequestsPage(UserController userController){
+    public UserRequestsPage(UserController userController) {
         setTitle("User Requests");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -39,7 +37,7 @@ public class UserRequestsPage extends JFrame{
         userTable = new JTable(tableModel);
         userTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-       // TODO: add users from table
+        // TODO: add users from table
 
         scrollPane = new JScrollPane(userTable);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
@@ -87,10 +85,11 @@ public class UserRequestsPage extends JFrame{
 
 
     }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             IStockDAO stockDAO = new StockDAOImpl();
-            UserController userController = new UserController();
+            UserController userController = new UserController(new UserDAOImpl(), new TransactionDAOImpl());
             new UserRequestsPage(userController).setVisible(true);
         });
     }

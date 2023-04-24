@@ -1,7 +1,10 @@
-package view;
+package view.userPages;
 
 import controller.StockController;
+import controller.UserController;
 import dao.impl.StockDAOImpl;
+import dao.impl.TransactionDAOImpl;
+import dao.impl.UserDAOImpl;
 import model.User;
 import session.CurrentUser;
 
@@ -14,9 +17,9 @@ public class UserMenuPage extends JFrame {
     private StockDisplayPage stockPage;
     private UserStockPage userStockPage;
 
-    public UserMenuPage(StockController stockController) {
-        stockPage = new StockDisplayPage(stockController, this);
-        userStockPage = new UserStockPage(stockController, this);
+    public UserMenuPage(StockController stockController, UserController userController) {
+        stockPage = new StockDisplayPage(stockController, userController, this);
+        userStockPage = new UserStockPage(stockController, userController, this);
 
         setTitle("Customer Stock Trading System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -27,7 +30,7 @@ public class UserMenuPage extends JFrame {
         GridBagConstraints gbc = new GridBagConstraints();
 
         User currentUser = new CurrentUser().getCurrentUser();
-        JLabel welcomeLabel = new JLabel("Welcome, " + currentUser.getUsername());
+        JLabel welcomeLabel = new JLabel("Welcome, " + currentUser.getName());
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 24));
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -80,8 +83,7 @@ public class UserMenuPage extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-
-                UserMenuPage userMenuPage = new UserMenuPage(new StockController(new StockDAOImpl()));
+                UserMenuPage userMenuPage = new UserMenuPage(new StockController(new StockDAOImpl(), new TransactionDAOImpl()), new UserController(new UserDAOImpl(), new TransactionDAOImpl()));
                 userMenuPage.setVisible(true);
             }
         });
