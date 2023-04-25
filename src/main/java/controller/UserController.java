@@ -13,6 +13,9 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
+
+import java.util.List;
+
 public class UserController {
     IUserDAO userDAO;
     ITransactionDAO transactionDAO;
@@ -23,6 +26,11 @@ public class UserController {
         this.transactionDAO = transactionDAO;
         this.stockDAO = stockDAO;
     }
+
+    public List<User> getRegisteredUsers(){
+        return userDAO.getRegisteredUsers();
+    }
+
 
     public Response buyStock(Stock stock, int buyQuantity) throws SQLException {
         //error: 1. no user log in 2. no enough money 3. no eno

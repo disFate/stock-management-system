@@ -3,12 +3,19 @@ package dao.impl;
 import DataSource.DatabaseConfig;
 import DataSource.DatabaseConnectionPool;
 import dao.IUserDAO;
+import model.Stock;
 import model.Transaction;
 import model.User;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * @Author: Tsuna
@@ -17,6 +24,29 @@ import java.sql.SQLException;
  */
 public class UserDAOImpl implements IUserDAO {
     DatabaseConfig databaseConfig = DatabaseConfig.getInstance();
+
+    public List<User> getRegisteredUsers(){
+        List<User> users = new ArrayList<>();
+        String query = "SELECT * FROM users WHERE approved = TRUE";
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                String email = resultSet.getString("email");
+                BigDecimal balance = resultSet.getBigDecimal("balance");
+
+                User newUser = new User(id, name, email, balance);
+                users.add(newUser);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return users;
+    }
+
 
     @Override
     public void updateStock(int userId, int stockId, int transactionQuantity, Transaction.Type type) throws SQLException {

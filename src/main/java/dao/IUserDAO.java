@@ -4,6 +4,7 @@ import model.Transaction;
 import model.User;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * @Author: Tsuna
@@ -15,4 +16,7 @@ public interface IUserDAO {
     void updateStock(int userId, int stockId, int transactionQuantity, Transaction.Type type) throws SQLException;
 
     void updateBalance(int userId, User user);
+
+
+    List<User>getRegisteredUsers();
 }

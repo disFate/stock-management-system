@@ -4,12 +4,16 @@ import controller.UserController;
 import dao.impl.StockDAOImpl;
 import dao.impl.TransactionDAOImpl;
 import dao.impl.UserDAOImpl;
+import controller.UserController;
 
+import model.User;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
 
 public class UserNotifyPage extends JFrame {
+    List<User> registeredUsers;
     private JPanel mainPanel;
     private JTable userTable;
     private JButton backButton;
@@ -30,12 +34,17 @@ public class UserNotifyPage extends JFrame {
         setContentPane(mainPanel);
         mainPanel.setLayout(new BorderLayout());
 
-        String[] columnNames = {"Username", "First Name", "Last Name", "Current Balance"};
+        String[] columnNames = {"ID", "Name", "Email", "Current Balance"};
         tableModel = new DefaultTableModel(columnNames, 0);
         userTable = new JTable(tableModel);
         userTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // TODO: add users from table
+        List <User> registeredUsers = userController.getRegisteredUsers();
+
+        for (User user: registeredUsers){
+            Object [] rowData = {user.getId(), user.getName(), user.getEmail(), user.getBalance()};
+            tableModel.addRow(rowData);
+        }
 
         scrollPane = new JScrollPane(userTable);
         mainPanel.add(scrollPane, BorderLayout.CENTER);

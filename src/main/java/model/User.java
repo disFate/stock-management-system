@@ -20,6 +20,12 @@ public class User {
         CUSTOMER;
     }
 
+    public User(int id, String name, String email, BigDecimal balance){
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.balance = balance;
+    }
     public User(int id, String name, String email, String password, Role role, boolean approved, BigDecimal balance) {
         this.id = id;
         this.name = name;
