@@ -25,6 +25,33 @@ public class StockDAOImpl implements IStockDAO {
         databaseConfig = DatabaseConfig.getInstance();
     }
 
+    public void addStock(int stockID, String symbol, String company, double price, int amount) {
+        String query = "INSERT INTO stocks (id, symbol, name, price, amount) VALUES (?, ?, ?, ?, ?)";
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);) {
+            statement.setInt(1, stockID);
+            statement.setString(2, symbol);
+            statement.setString(3, company);
+            statement.setDouble(4, price);
+            statement.setInt(5, amount);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void deleteStock(int stockID) {
+        String query = "DELETE FROM stocks WHERE id=?";
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);) {
+            statement.setInt(1, stockID);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public List<Stock> getAllStocks() {
         List<Stock> stocks = new ArrayList<>();

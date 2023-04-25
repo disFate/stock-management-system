@@ -25,6 +25,7 @@ public class addEditDeleteStocks extends JFrame {
     private DefaultTableModel tableModel;
 
     public addEditDeleteStocks(StockController stockController) {
+        //TODO: add ID to the table
         setTitle("All Stocks");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -81,7 +82,7 @@ public class addEditDeleteStocks extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = stockTable.getSelectedRow();
                 if (selectedRow != -1) {
-                    //perform delete
+                    stockController.deleteStock((Integer) stockTable.getModel().getValueAt(selectedRow, 0));
                 } else {
                     JOptionPane.showMessageDialog(null, "please select a stock");
                 }
@@ -118,12 +119,12 @@ public class addEditDeleteStocks extends JFrame {
 
                 if (result == JOptionPane.OK_OPTION) {
                     // get the values entered by the user
+                    int id;
                     String symbol = symbolField.getText();
                     String company = companyField.getText();
                     double price = Double.parseDouble(priceField.getText());
                     int amount = Integer.parseInt(amountField.getText());
-
-                    // TODO: add the stock to the list
+                    //call add stock, need to change popup.
                 }
             }
         });
