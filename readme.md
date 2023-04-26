@@ -9,15 +9,15 @@ CREATE TABLE users (
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    role ENUM('customer') NOT NULL,
-    approved BOOLEAN NOT NULL DEFAULT FALSE,
+    role ENUM('customer', 'manager') NOT NULL,
+    approved ENUM('registered', 'pending', 'approved', 'declined') NOT NULL,
     balance DECIMAL(10, 2) NOT NULL DEFAULT 0
 );
 
 CREATE TABLE stocks (
     id INT PRIMARY KEY AUTO_INCREMENT,
     symbol VARCHAR(10) NOT NULL UNIQUE,
-    company_name VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
     amount INT NOT NULL
 );
