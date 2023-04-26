@@ -34,7 +34,7 @@ public class UserNotifyPage extends JFrame {
         setContentPane(mainPanel);
         mainPanel.setLayout(new BorderLayout());
 
-        String[] columnNames = {"ID", "Name", "Email", "Current Balance"};
+        String[] columnNames = {"Username", "First Name", "Last Name", "Current Balance"};
         tableModel = new DefaultTableModel(columnNames, 0);
         userTable = new JTable(tableModel);
         userTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
