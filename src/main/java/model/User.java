@@ -5,6 +5,7 @@ package model;
  * @Date: 2023-04-21-16:18
  * @Description:
  */
+
 import java.math.BigDecimal;
 
 public class User {
@@ -13,14 +14,10 @@ public class User {
     private String email;
     private String password;
     private Role role;
-    private boolean approved;
+    private Approved approved;
     private BigDecimal balance;
 
-    public enum Role {
-        CUSTOMER;
-    }
-
-    public User(int id, String name, String email, String password, Role role, boolean approved, BigDecimal balance) {
+    public User(int id, String name, String email, String password, Role role, Approved approved, BigDecimal balance) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -70,11 +67,11 @@ public class User {
         this.role = role;
     }
 
-    public boolean isApproved() {
+    public Approved isApproved() {
         return approved;
     }
 
-    public void setApproved(boolean approved) {
+    public void setApproved(Approved approved) {
         this.approved = approved;
     }
 
@@ -84,5 +81,17 @@ public class User {
 
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
+    }
+
+    public enum Role {
+        CUSTOMER,
+        MANAGER;
+    }
+
+    public enum Approved {
+        REGISTERED,
+        PENDING,
+        APPROVED,
+        DECLINED;
     }
 }
