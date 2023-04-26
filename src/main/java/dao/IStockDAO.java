@@ -17,4 +17,8 @@ public interface IStockDAO {
     List<Stock> getUserStocks(int userId);
 
     void updateAmount(int stockId, int transactionAmount, Transaction.Type transactionType);
+
+    void addStock( String symbol, String Company, double Price, int amount);
+
+    void deleteStock(String Company);
 }

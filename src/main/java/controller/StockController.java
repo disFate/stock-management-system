@@ -34,4 +34,13 @@ public class StockController {
         }
         return stockDAO.getUserStocks(currentUser.getId());
     }
+
+    public void addStock (String symbol, String company, double price, int amount){
+        stockDAO.addStock( symbol,  company,  price,  amount);
+    }
+
+    public void deleteStock(String company){
+        stockDAO.deleteStock(company);
+    }
+
 }

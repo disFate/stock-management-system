@@ -17,6 +17,7 @@ public class User {
     private Approved approved;
     private BigDecimal balance;
 
+
     public User(int id, String name, String email, String password, Role role, Approved approved, BigDecimal balance) {
         this.id = id;
         this.name = name;
