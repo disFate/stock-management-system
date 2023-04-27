@@ -21,4 +21,6 @@ public interface IStockDAO {
     void addStock( String symbol, String Company, double Price, int amount);
 
     void deleteStock(String Company);
+
+    void editStock(String oldName, String symbol, String Company, double Price, int amount);
 }

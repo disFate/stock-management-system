@@ -26,7 +26,7 @@ public class StockDAOImpl implements IStockDAO {
     }
 
     public void addStock(String symbol, String company_name, double price, int amount) {
-        String query = "INSERT INTO stocks (symbol, company_name, price, amount) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO stocks (symbol, name, price, amount) VALUES (?, ?, ?, ?)";
         try (Connection connection = DatabaseConnectionPool.getConnection();
              PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);) {
             statement.setString(1, symbol);
@@ -46,8 +46,29 @@ public class StockDAOImpl implements IStockDAO {
         }
     }
 
+    public void editStock(String oldName, String symbol, String company_name, double price, int amount){
+        String query = "UPDATE stocks SET symbol = ?, name = ?, price = ?, amount = ? WHERE name = ?";
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, symbol);
+            statement.setString(2, company_name);
+            statement.setDouble(3, price);
+            statement.setInt(4, amount);
+            statement.setString(5, oldName);
+            int rowsAffected = statement.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("Successfully updated stock with name: " + oldName);
+            } else {
+                System.out.println("No stock found with name: " + oldName);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void deleteStock(String companyName) {
-        String query = "DELETE FROM stocks WHERE company_name=?";
+        String query = "DELETE FROM stocks WHERE name=?";
         try (Connection connection = DatabaseConnectionPool.getConnection();
              PreparedStatement statement = connection.prepareStatement(query);) {
             statement.setString(1, companyName);

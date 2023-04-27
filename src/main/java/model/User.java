@@ -18,6 +18,13 @@ public class User {
     private BigDecimal balance;
 
 
+    public User(int id, String name, String email, BigDecimal balance){
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.balance = balance;
+    }
+
     public User(int id, String name, String email, String password, Role role, Approved approved, BigDecimal balance) {
         this.id = id;
         this.name = name;

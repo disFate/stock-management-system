@@ -43,4 +43,8 @@ public class StockController {
         stockDAO.deleteStock(company);
     }
 
+    public void editStock (String oldName, String Symbol, String name, double price, int amount ){
+        stockDAO.editStock(oldName, Symbol, name, price, amount);
+    }
+
 }

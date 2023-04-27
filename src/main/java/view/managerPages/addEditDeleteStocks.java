@@ -70,7 +70,55 @@ public class addEditDeleteStocks extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = stockTable.getSelectedRow();
                 if (selectedRow != -1) {
-                    //perform edit
+                    // get the current values of the selected row
+                    String oldName = (String) tableModel.getValueAt(selectedRow, 1);
+                    String symbol = (String) tableModel.getValueAt(selectedRow, 0);
+                    double price = (double) tableModel.getValueAt(selectedRow, 2);
+                    int amount = (int) tableModel.getValueAt(selectedRow, 3);
+
+                    // create the edit stock panel
+                    JPanel panel = new JPanel(new GridLayout(4, 2, 5, 5));
+                    panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+                    JLabel symbolLabel = new JLabel("Symbol:");
+                    JTextField symbolField = new JTextField(symbol);
+                    JLabel companyLabel = new JLabel("Company:");
+                    JTextField companyField = new JTextField(oldName);
+                    JLabel priceLabel = new JLabel("Price:");
+                    JTextField priceField = new JTextField(Double.toString(price));
+                    JLabel amountLabel = new JLabel("Amount:");
+                    JTextField amountField = new JTextField(Integer.toString(amount));
+
+                    panel.add(symbolLabel);
+                    panel.add(symbolField);
+                    panel.add(companyLabel);
+                    panel.add(companyField);
+                    panel.add(priceLabel);
+                    panel.add(priceField);
+                    panel.add(amountLabel);
+                    panel.add(amountField);
+
+                    int result = JOptionPane.showConfirmDialog(null, panel, "Edit Stock",
+                            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+                    if (result == JOptionPane.OK_OPTION) {
+                        // get the values entered by the user
+                        String newSymbol = symbolField.getText();
+                        String newCompany = companyField.getText();
+                        double newPrice = Double.parseDouble(priceField.getText());
+                        int newAmount = Integer.parseInt(amountField.getText());
+
+                        // call the editStock method in stockController
+                        stockController.editStock(oldName, newSymbol, newCompany, newPrice, newAmount);
+
+                        // update the tableModel with the new stock data
+                        Object[] rowData = {newSymbol, newCompany, newPrice, newAmount};
+                        tableModel.setValueAt(newSymbol, selectedRow, 0);
+                        tableModel.setValueAt(newCompany, selectedRow, 1);
+                        tableModel.setValueAt(newPrice, selectedRow, 2);
+                        tableModel.setValueAt(newAmount, selectedRow, 3);
+                        tableModel.fireTableDataChanged(); // force the JTable to redraw itself
+                    }
                 } else {
                     JOptionPane.showMessageDialog(null, "please select a stock");
                 }
