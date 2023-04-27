@@ -25,12 +25,12 @@ public class StockDAOImpl implements IStockDAO {
         databaseConfig = DatabaseConfig.getInstance();
     }
 
-    public void addStock(String symbol, String company, double price, int amount) {
+    public void addStock(String symbol, String company_name, double price, int amount) {
         String query = "INSERT INTO stocks (symbol, company_name, price, amount) VALUES (?, ?, ?, ?)";
         try (Connection connection = DatabaseConnectionPool.getConnection();
              PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);) {
             statement.setString(1, symbol);
-            statement.setString(2, company);
+            statement.setString(2, company_name);
             statement.setDouble(3, price);
             statement.setInt(4, amount);
             statement.executeUpdate();

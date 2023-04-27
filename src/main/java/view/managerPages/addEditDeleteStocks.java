@@ -139,6 +139,7 @@ public class addEditDeleteStocks extends JFrame {
     }
 
     public static void main(String[] args) {
+        System.out.println("Running page");
         SwingUtilities.invokeLater(() -> {
             IStockDAO stockDAO = new StockDAOImpl();
             ITransactionDAO transactionDAO = new TransactionDAOImpl();
