@@ -17,6 +17,14 @@ public interface IUserDAO {
 
     void updateBalance(int userId, User user);
 
+    void updateUserApproved(int userId);
+    void updateUserDenied(int userId);
+
+    int getCountPending();
+
+
 
     List<User>getRegisteredUsers();
+
+    List<User>getPendingUsers();
 }

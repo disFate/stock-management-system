@@ -1,13 +1,14 @@
 package view.managerPages;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.*;
+
+import controller.StockController;
+import controller.UserController;
+import dao.impl.StockDAOImpl;
+import dao.impl.TransactionDAOImpl;
+import dao.impl.UserDAOImpl;
 
 public class ManagerFirstPage extends JFrame {
 
@@ -17,59 +18,71 @@ public class ManagerFirstPage extends JFrame {
 
     private JButton backButton;
 
-    public ManagerFirstPage() {
+    public ManagerFirstPage(UserController userController) {
         setTitle("Manager Page");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new GridBagLayout());
+        setResizable(false);
 
-        // Create the main panel with a BorderLayout
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(Color.WHITE);
-        add(mainPanel);
+        GridBagConstraints gbc = new GridBagConstraints();
 
-        // Create a panel for the center buttons with a GridLayout
-        JPanel centerPanel = new JPanel(new GridLayout(2, 1, 10, 10));
-        centerPanel.setBackground(Color.WHITE);
-        mainPanel.add(centerPanel, BorderLayout.CENTER);
+        JLabel welcomeLabel = new JLabel("Welcome, ");
+        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.NORTH;
+        gbc.insets = new Insets(0, 0, 40, 0); // Add a bottom margin of 40 pixels
+        add(welcomeLabel, gbc);
 
-        // Create the stocks button and add it to the center panel
-        stocksButton = new JButton("Stock Management");
-        stocksButton.setPreferredSize(new Dimension(200, 100));
-        stocksButton.setFont(new Font("Arial", Font.BOLD, 20));
-        centerPanel.add(stocksButton);
 
-        // Create the users button and add it to the center panel
-        usersButton = new JButton("Users Management");
-        usersButton.setPreferredSize(new Dimension(200, 100));
-        usersButton.setFont(new Font("Arial", Font.BOLD, 20));
-        centerPanel.add(usersButton);
+        JButton notificationButton = new JButton("User Requests (" + userController.getPendingCount() + ")");
+        notificationButton.setPreferredSize(new Dimension(200, 50));
 
-        // Create a panel for the notification button with a FlowLayout
-        JPanel notificationPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        notificationPanel.setBackground(Color.WHITE);
-        mainPanel.add(notificationPanel, BorderLayout.NORTH);
+        UserRequestsPage requestPage = new UserRequestsPage(new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl()));
 
-        // Create the notification button and add it to the notification panel
-        notificationButton = new JButton("Notifications");
-        notificationButton.setPreferredSize(new Dimension(150, 40));
-        notificationButton.setFont(new Font("Arial", Font.BOLD, 14));
-        notificationPanel.add(notificationButton);
+        addEditDeleteStocks stocksPage = new addEditDeleteStocks(new StockController(new StockDAOImpl(), new TransactionDAOImpl()));
+        notificationButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                requestPage.setVisible(true);
+                setVisible(false);
+            }
+        });
 
-        // Set the main panel as the content pane
-        setContentPane(mainPanel);
+        JButton stocksButton = new JButton("Stocks Management");
+        stocksButton.setPreferredSize(new Dimension(200, 50));
+        stocksButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                stocksPage.setVisible(true);
+                setVisible(false);
+            }
+        });
 
-        // Center the frame on the screen
+        JButton usersButton = new JButton("User Management");
+        usersButton.setPreferredSize(new Dimension(200, 50));
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.insets = new Insets(0, 0, 0, 0);
+        add(notificationButton, gbc);
+
+        gbc.gridy = 2;
+        add(stocksButton, gbc);
+
+        gbc.gridy = 3;
+        add(usersButton, gbc);
+
+        getContentPane().setBackground(new Color(235, 235, 235));
+
+
         setLocationRelativeTo(null);
-
-        JPanel bottomPanel = new JPanel(new BorderLayout());
-        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
-
-        backButton = new JButton("back");
-        bottomPanel.add(backButton, BorderLayout.WEST);
     }
 
     public static void main(String[] args) {
-        ManagerFirstPage managerFirstPage = new ManagerFirstPage();
+        System.out.println("Running page");
+        ManagerFirstPage managerFirstPage = new ManagerFirstPage( new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl()));
         managerFirstPage.setVisible(true);
     }
 }
