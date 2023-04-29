@@ -4,9 +4,8 @@ import controller.UserController;
 import dao.impl.StockDAOImpl;
 import dao.impl.TransactionDAOImpl;
 import dao.impl.UserDAOImpl;
-import controller.UserController;
+import model.Entity.User;
 
-import model.User;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -39,10 +38,10 @@ public class UserNotifyPage extends JFrame {
         userTable = new JTable(tableModel);
         userTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        List <User> registeredUsers = userController.getRegisteredUsers();
+        List<User> registeredUsers = userController.getRegisteredUsers();
 
-        for (User user: registeredUsers){
-            Object [] rowData = {user.getId(), user.getName(), user.getEmail(), user.getBalance()};
+        for (User user : registeredUsers) {
+            Object[] rowData = {user.getId(), user.getName(), user.getEmail(), user.getBalance()};
             tableModel.addRow(rowData);
         }
 

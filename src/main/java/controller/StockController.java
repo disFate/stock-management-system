@@ -8,8 +8,8 @@ package controller;
 
 import dao.IStockDAO;
 import dao.ITransactionDAO;
-import model.Stock;
-import model.User;
+import model.Entity.Stock;
+import model.Entity.User;
 import session.CurrentUser;
 
 import java.util.List;
@@ -28,23 +28,22 @@ public class StockController {
     }
 
     public List<Stock> getUserStocks() {
-        User currentUser = new CurrentUser().getCurrentUser();
+        User currentUser = CurrentUser.getCurrentUser();
         if (currentUser == null) {
             throw new IllegalStateException("No user is currently logged in");
         }
         return stockDAO.getUserStocks(currentUser.getId());
     }
 
-    public void addStock (String symbol, String company, double price, int amount){
-        stockDAO.addStock( symbol,  company,  price,  amount);
+    public void addStock(String symbol, String company, double price, int amount) {
+        stockDAO.addStock(symbol, company, price, amount);
     }
 
-    public void deleteStock(String company){
+    public void deleteStock(String company) {
         stockDAO.deleteStock(company);
     }
 
-    public void editStock (String oldName, String Symbol, String name, double price, int amount ){
+    public void editStock(String oldName, String Symbol, String name, double price, int amount) {
         stockDAO.editStock(oldName, Symbol, name, price, amount);
     }
-
 }

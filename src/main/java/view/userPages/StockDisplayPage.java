@@ -8,7 +8,7 @@ package view.userPages;
 
 import controller.StockController;
 import controller.UserController;
-import model.Stock;
+import model.Entity.Stock;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -28,6 +28,10 @@ public class StockDisplayPage extends JFrame {
     private JScrollPane scrollPane;
     private DefaultTableModel tableModel;
 
+    {
+
+    }
+
     public StockDisplayPage(StockController stockController, UserController userController, UserMenuPage userMenuPage) {
         setTitle("market stocks");
         setSize(800, 600);
@@ -43,11 +47,7 @@ public class StockDisplayPage extends JFrame {
         stockTable = new JTable(tableModel);
         stockTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        stocks = stockController.getAllStocks();
-        for (Stock stock : stocks) {
-            Object[] rowData = {stock.getSymbol(), stock.getName(), stock.getPrice(), stock.getAmount()};
-            tableModel.addRow(rowData);
-        }
+        //loadData(stockController);
 
         scrollPane = new JScrollPane(stockTable);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
@@ -81,12 +81,13 @@ public class StockDisplayPage extends JFrame {
                             getValueAt(selectedRow, 0))).findFirst().orElse(null);
                     try {
                         if (userController.buyStock(stock, quantity).isSuccess() == true) {
+                            stock.setAmount(stock.getAmount() - quantity);
                             tableModel.setValueAt(stock.getAmount(), selectedRow, 3);
                             tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
-                            Thread thread = new Thread(() -> {
-                                userMenuPage.notifyUpdate(1, stockController);
-                            });
-                            thread.start();
+//                            Thread thread = new Thread(() -> {
+//                                userMenuPage.notifyUpdate(1, stockController);
+//                            });
+//                            thread.start();
                         }
                     } catch (SQLException ex) {
                         throw new RuntimeException(ex);

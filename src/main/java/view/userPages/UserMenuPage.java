@@ -5,13 +5,15 @@ import controller.UserController;
 import dao.impl.StockDAOImpl;
 import dao.impl.TransactionDAOImpl;
 import dao.impl.UserDAOImpl;
-import model.User;
+import model.DTO.UserStockInfo;
+import model.Entity.User;
 import session.CurrentUser;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class UserMenuPage extends JFrame {
     private StockDisplayPage stockPage;//0
@@ -29,7 +31,7 @@ public class UserMenuPage extends JFrame {
 
         GridBagConstraints gbc = new GridBagConstraints();
 
-        User currentUser = new CurrentUser().getCurrentUser();
+        User currentUser = CurrentUser.getCurrentUser();
         JLabel welcomeLabel = new JLabel("Welcome, " + currentUser.getName());
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 24));
         gbc.gridx = 0;
@@ -45,6 +47,7 @@ public class UserMenuPage extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 stockPage.setVisible(true);
+                stockPage.loadData(stockController);
                 setVisible(false);
             }
         });
@@ -55,6 +58,7 @@ public class UserMenuPage extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 userStockPage.setVisible(true);
+                userStockPage.loadData(stockController);
                 setVisible(false);
             }
         });
@@ -85,6 +89,9 @@ public class UserMenuPage extends JFrame {
             public void run() {
                 UserMenuPage userMenuPage = new UserMenuPage(new StockController(new StockDAOImpl(), new TransactionDAOImpl()), new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl()));
                 userMenuPage.setVisible(true);
+                UserController userController = new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl());
+                List<UserStockInfo> unrealizedProfit = userController.getUnrealizedProfit(CurrentUser.getCurrentUser().getId());
+                System.out.println(unrealizedProfit);
             }
         });
     }

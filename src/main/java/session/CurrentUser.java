@@ -1,6 +1,6 @@
 package session;
 
-import model.User;
+import model.Entity.User;
 
 import java.math.BigDecimal;
 
@@ -10,19 +10,17 @@ import java.math.BigDecimal;
  * @Description:
  */
 public class CurrentUser {
-    private User currentUser;
+    private static User currentUser;
+
+    static {
+        currentUser = new User(2, "dong", "tsuna@bu.edu", "123", User.Role.CUSTOMER, User.Approved.APPROVED, BigDecimal.valueOf(100000l), BigDecimal.valueOf(0));
+    }
 
     public CurrentUser() {
-        this.currentUser = new User(2, "dong", "tsuna@bu.edu", "123", User.Role.CUSTOMER, User.Approved.APPROVED, BigDecimal.valueOf(100000l));
-        // todo find a way to really restore the current user info
     }
 
-    public User getCurrentUser() {
+    public static User getCurrentUser() {
         return currentUser;
-    }
-
-    public void setCurrentUser(User currentUser) {
-        this.currentUser = currentUser;
     }
 }
 

@@ -6,8 +6,8 @@ package dao;
  * @Description:
  */
 
-import model.Stock;
-import model.Transaction;
+import model.Entity.Stock;
+import model.Entity.Transaction;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public interface IStockDAO {
 
     void updateAmount(int stockId, int transactionAmount, Transaction.Type transactionType);
 
-    void addStock( String symbol, String Company, double Price, int amount);
+    void addStock(String symbol, String Company, double Price, int amount);
 
     void deleteStock(String Company);
 

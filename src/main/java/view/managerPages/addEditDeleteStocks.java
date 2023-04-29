@@ -5,7 +5,7 @@ import dao.IStockDAO;
 import dao.ITransactionDAO;
 import dao.impl.StockDAOImpl;
 import dao.impl.TransactionDAOImpl;
-import model.Stock;
+import model.Entity.Stock;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

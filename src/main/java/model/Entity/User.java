@@ -1,4 +1,4 @@
-package model;
+package model.Entity;
 
 /**
  * @Author: Tsuna
@@ -17,15 +17,17 @@ public class User {
     private Approved approved;
     private BigDecimal balance;
 
+    private BigDecimal realizedProfit;
 
-    public User(int id, String name, String email, BigDecimal balance){
+
+    public User(int id, String name, String email, BigDecimal balance) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.balance = balance;
     }
 
-    public User(int id, String name, String email, String password, Role role, Approved approved, BigDecimal balance) {
+    public User(int id, String name, String email, String password, Role role, Approved approved, BigDecimal balance, BigDecimal realizedProfit) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -33,6 +35,7 @@ public class User {
         this.role = role;
         this.approved = approved;
         this.balance = balance;
+        this.realizedProfit = realizedProfit;
     }
 
     public int getId() {

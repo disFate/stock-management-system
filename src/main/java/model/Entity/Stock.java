@@ -1,4 +1,6 @@
-package model;
+package model.Entity;
+
+import java.math.BigDecimal;
 
 /**
  * @Author: Tsuna
@@ -6,20 +8,22 @@ package model;
  * @Description:
  */
 public class Stock {
-    public Stock(){}
-    public Stock(int id, String symbol, String name, double price, int amount) {
+    private int id;
+    private String symbol;
+    private String name;
+    private BigDecimal price;
+    private int amount;
+
+    public Stock() {
+    }
+
+    public Stock(int id, String symbol, String name, BigDecimal price, int amount) {
         this.id = id;
         this.symbol = symbol;
         this.name = name;
         this.price = price;
         this.amount = amount;
     }
-
-    private int id;
-    private String symbol;
-    private String name;
-    private double price;
-    private int amount;
 
     public int getId() {
         return id;
@@ -45,11 +49,11 @@ public class Stock {
         this.name = name;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

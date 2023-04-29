@@ -1,4 +1,4 @@
-package model;
+package model.Entity;
 
 /**
  * @Author: Tsuna
@@ -7,6 +7,7 @@ package model;
  */
 // model/Transaction.java
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Transaction {
@@ -15,10 +16,10 @@ public class Transaction {
     private int stockId;
     private Type type;
     private int quantity;
-    private Double price;
+    private BigDecimal price;
     private LocalDateTime transactionDate;
 
-    public Transaction(int id, int userId, int stockId, Type type, int quantity, double price, LocalDateTime transactionDate) {
+    public Transaction(int id, int userId, int stockId, Type type, int quantity, BigDecimal price, LocalDateTime transactionDate) {
         this.id = id;
         this.userId = userId;
         this.stockId = stockId;
@@ -68,11 +69,11 @@ public class Transaction {
         this.quantity = quantity;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

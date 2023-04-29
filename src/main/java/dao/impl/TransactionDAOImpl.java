@@ -9,8 +9,7 @@ package dao.impl;
 import DataSource.DatabaseConfig;
 import DataSource.DatabaseConnectionPool;
 import dao.ITransactionDAO;
-import model.Transaction;
-import model.User;
+import model.Entity.Transaction;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -32,7 +31,7 @@ public class TransactionDAOImpl implements ITransactionDAO {
             preparedStatement.setInt(2, transaction.getStockId());
             preparedStatement.setString(3, transaction.getType().toString());
             preparedStatement.setInt(4, transaction.getQuantity());
-            preparedStatement.setDouble(5, transaction.getPrice());
+            preparedStatement.setBigDecimal(5, transaction.getPrice());
 
             preparedStatement.executeUpdate();
         } catch (Exception e) {
@@ -41,12 +40,12 @@ public class TransactionDAOImpl implements ITransactionDAO {
     }
 
     @Override
-    public List<Transaction> getTransactionsByUser(User user) {
+    public List<Transaction> getTransactionsByUserId(int userId) {
         List<Transaction> transactions = new ArrayList<>();
         String sql = "SELECT * FROM transactions WHERE user_id = ?";
         try (Connection connection = DatabaseConnectionPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql);) {
-            preparedStatement.setInt(1, user.getId());
+            preparedStatement.setInt(1, userId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -56,7 +55,7 @@ public class TransactionDAOImpl implements ITransactionDAO {
                         resultSet.getInt("stock_id"),
                         Transaction.Type.valueOf(resultSet.getString("type")),
                         resultSet.getInt("quantity"),
-                        resultSet.getDouble("price"),
+                        resultSet.getBigDecimal("price"),
                         resultSet.getTimestamp("transaction_date").toLocalDateTime()
                 );
                 transactions.add(transaction);

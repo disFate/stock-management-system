@@ -9,7 +9,7 @@ package view.userPages;
 import common.Response;
 import controller.StockController;
 import controller.UserController;
-import model.Stock;
+import model.Entity.Stock;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -44,11 +44,7 @@ public class UserStockPage extends JFrame {
         userStockTable = new JTable(tableModel);
         userStockTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        userStocks = stockController.getUserStocks();
-        for (Stock stock : userStocks) {
-            Object[] rowData = {stock.getSymbol(), stock.getName(), stock.getPrice(), stock.getAmount()};
-            tableModel.addRow(rowData);
-        }
+        //loadData(stockController);
 
         scrollPane = new JScrollPane(userStockTable);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
@@ -81,17 +77,16 @@ public class UserStockPage extends JFrame {
                     //todo a pop up window to select quantity
                     int quantity = 1;
 
-                    // Time the database operation
-                    //long dbStartTime = System.nanoTime();
                     try {
                         Response res = userController.sellStock(stock, quantity);
                         if (res.isSuccess() == true) {
+                            stock.setAmount(stock.getAmount() - quantity);
                             tableModel.setValueAt(stock.getAmount(), selectedRow, 3);
                             tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
-                            Thread thread = new Thread(() -> {
-                                userMenuPage.notifyUpdate(0, stockController);
-                            });
-                            thread.start();
+//                            Thread thread = new Thread(() -> {
+//                                userMenuPage.notifyUpdate(0, stockController);
+//                            });
+//                            thread.start();
 
                         } else {
                             System.out.println(res.getMessage());
