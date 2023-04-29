@@ -5,7 +5,7 @@ import dao.IStockDAO;
 import dao.impl.StockDAOImpl;
 import dao.impl.TransactionDAOImpl;
 import dao.impl.UserDAOImpl;
-import model.User;
+import model.Entity.User;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -41,8 +41,8 @@ public class UserRequestsPage extends JFrame {
 
         List<User> pendingUsers = userController.getPendingUsers();
 
-        for (User user: pendingUsers){
-            Object [] rowData = {user.getId(), user.getName(), user.getEmail(), user.getBalance()};
+        for (User user : pendingUsers) {
+            Object[] rowData = {user.getId(), user.getName(), user.getEmail(), user.getBalance()};
             tableModel.addRow(rowData);
         }
 
