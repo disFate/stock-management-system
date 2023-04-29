@@ -5,12 +5,14 @@ import dao.IStockDAO;
 import dao.impl.StockDAOImpl;
 import dao.impl.TransactionDAOImpl;
 import dao.impl.UserDAOImpl;
+import model.User;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class UserRequestsPage extends JFrame {
     private JPanel mainPanel;
@@ -32,12 +34,18 @@ public class UserRequestsPage extends JFrame {
         setContentPane(mainPanel);
         mainPanel.setLayout(new BorderLayout());
 
-        String[] columnNames = {"Username", "First Name", "Last Name", "Current Balance"};
+        String[] columnNames = {"ID", "Name", "Email", "Current Balance"};
         tableModel = new DefaultTableModel(columnNames, 0);
         userTable = new JTable(tableModel);
         userTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // TODO: add users from table
+        List<User> pendingUsers = userController.getPendingUsers();
+
+        for (User user: pendingUsers){
+            Object [] rowData = {user.getId(), user.getName(), user.getEmail(), user.getBalance()};
+            tableModel.addRow(rowData);
+        }
+
 
         scrollPane = new JScrollPane(userTable);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
@@ -64,7 +72,8 @@ public class UserRequestsPage extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = userTable.getSelectedRow();
                 if (selectedRow != -1) {
-                    //perform approve
+                    int userID = (int) tableModel.getValueAt(selectedRow, 0);
+                    userController.updateUserApproved(userID);
                 } else {
                     JOptionPane.showMessageDialog(null, "please select a user");
                 }
@@ -76,7 +85,8 @@ public class UserRequestsPage extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = userTable.getSelectedRow();
                 if (selectedRow != -1) {
-                    //perform deny
+                    int userID = (int) tableModel.getValueAt(selectedRow, 0);
+                    userController.updateUserDenied(userID);
                 } else {
                     JOptionPane.showMessageDialog(null, "please select a user");
                 }
@@ -87,6 +97,7 @@ public class UserRequestsPage extends JFrame {
     }
 
     public static void main(String[] args) {
+        System.out.println("RUNNING PAGE");
         SwingUtilities.invokeLater(() -> {
             IStockDAO stockDAO = new StockDAOImpl();
             UserController userController = new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl());

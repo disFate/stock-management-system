@@ -30,7 +30,16 @@ public class UserController {
         return userDAO.getRegisteredUsers();
     }
 
+    public List<User>getPendingUsers(){return userDAO.getPendingUsers();
 
+    }
+
+    public int getPendingCount(){
+        return userDAO.getCountPending();
+    }
+
+    public void updateUserDenied(int userID){userDAO.updateUserDenied(userID);}
+    public void updateUserApproved(int userID){userDAO.updateUserApproved(userID);}
     public Response buyStock(Stock stock, int buyQuantity) throws SQLException {
         //error: 1. no user log in 2. no enough money 3. no eno
         User currentUser = userDAO.getUserById(CurrentUser.getCurrentUser().getId());

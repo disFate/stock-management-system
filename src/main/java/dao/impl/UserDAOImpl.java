@@ -107,27 +107,9 @@ public class UserDAOImpl implements IUserDAO {
         }
     }
 
-
-//
-//    @Override
-//    public void sellStock(int userId, Stock stock, int buyQuantity) throws SQLException {
-//        String sql = "UPDATE user_stocks SET quantity = quantity - ? " +
-//                "WHERE user_id = ? AND stock_id = ?";
-//        try (Connection connection = DatabaseConnectionPool.getConnection();
-//             PreparedStatement updateStatement = connection.prepareStatement(sql);) {
-//            int stockId = stock.getId();
-//            updateStatement.setInt(1, buyQuantity);
-//            updateStatement.setInt(2, userId);
-//            updateStatement.setInt(3, stockId);
-//            updateStatement.executeUpdate();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     public List<User> getRegisteredUsers() {
         List<User> users = new ArrayList<>();
-        String query = "SELECT * FROM users WHERE approved = TRUE";
+        String query = "SELECT * FROM users WHERE approved = 'approved' AND role = 'customer'";
         try (Connection connection = DatabaseConnectionPool.getConnection();
              PreparedStatement statement = connection.prepareStatement(query);) {
             ResultSet resultSet = statement.executeQuery();
@@ -238,4 +220,63 @@ public class UserDAOImpl implements IUserDAO {
     }
 
 
+    public void updateUserApproved(int userId) {
+        String query = "UPDATE users SET approved = 'approved' WHERE id = ?";
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);) {
+            statement.setInt(1, userId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateUserDenied(int userId) {
+        String query = "UPDATE users SET approved = 'denied' WHERE id = ?";
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);) {
+            statement.setInt(1, userId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int getCountPending() {
+        int count = 0;
+        String query = "SELECT COUNT(*) FROM users WHERE approved = 'pending'";
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);) {
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                count = resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return count;
+    }
+
+    public List<User> getPendingUsers() {
+        List<User> users = new ArrayList<>();
+        String query = "SELECT * FROM users WHERE approved = 'pending' AND role = 'customer'";
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                String email = resultSet.getString("email");
+                BigDecimal balance = resultSet.getBigDecimal("balance");
+
+                User newUser = new User(id, name, email, balance);
+                users.add(newUser);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return users;
+    }
 }

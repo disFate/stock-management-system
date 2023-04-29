@@ -28,4 +28,12 @@ public interface IUserDAO {
     User getUserById(int userId);
 
     void updateRealizedProfit(int userId, int stockId, int quantity, BigDecimal price);
+
+    void updateUserApproved(int userId);
+
+    void updateUserDenied(int userId);
+
+    int getCountPending();
+
+    List<User> getPendingUsers();
 }
