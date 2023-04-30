@@ -42,6 +42,8 @@ public class ManagerFirstPage extends JFrame {
         UserRequestsPage requestPage = new UserRequestsPage(new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl()));
 
         addEditDeleteStocks stocksPage = new addEditDeleteStocks(new StockController(new StockDAOImpl(), new TransactionDAOImpl()));
+
+        UserNotifyPage userPage = new UserNotifyPage(new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl()));
         notificationButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -62,6 +64,14 @@ public class ManagerFirstPage extends JFrame {
 
         JButton usersButton = new JButton("User Management");
         usersButton.setPreferredSize(new Dimension(200, 50));
+
+        usersButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                userPage.setVisible(true);
+                setVisible(false);
+            }
+        });
 
         gbc.gridx = 0;
         gbc.gridy = 1;
