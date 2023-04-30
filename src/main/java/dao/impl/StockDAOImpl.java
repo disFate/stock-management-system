@@ -120,7 +120,7 @@ public class StockDAOImpl implements IStockDAO {
     }
 
     public void deleteStock(String companyName) {
-        String query = "DELETE FROM stocks WHERE name=?";
+        String query = "UPDATE stocks SET isDeleted=true WHERE name=?";
         try (Connection connection = DatabaseConnectionPool.getConnection();
              PreparedStatement statement = connection.prepareStatement(query);) {
             statement.setString(1, companyName);

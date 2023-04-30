@@ -12,6 +12,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
 import java.util.List;
 
 public class addEditDeleteStocks extends JFrame {
@@ -73,7 +74,9 @@ public class addEditDeleteStocks extends JFrame {
                     // get the current values of the selected row
                     String oldName = (String) tableModel.getValueAt(selectedRow, 1);
                     String symbol = (String) tableModel.getValueAt(selectedRow, 0);
-                    double price = (double) tableModel.getValueAt(selectedRow, 2);
+
+                    BigDecimal bigDprice = (BigDecimal) tableModel.getValueAt(selectedRow, 2);
+                    double price = bigDprice.doubleValue();
                     int amount = (int) tableModel.getValueAt(selectedRow, 3);
 
                     // create the edit stock panel
