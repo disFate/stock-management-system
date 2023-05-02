@@ -69,6 +69,7 @@ public class UserMenuPage extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 manageAccountPage.setVisible(true);
+                manageAccountPage.loadData(userController);
                 setVisible(false);
             }
         });

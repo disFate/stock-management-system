@@ -82,7 +82,11 @@ public class UserStockPage extends JFrame {
                         Response res = userController.sellStock(userStockInfo.getStockId(), quantity);
                         if (res.isSuccess()) {
                             UserStockInfo updatedUserStockInfo = userController.getUserStockInfo(userStockInfo.getUserId(), userStockInfo.getStockId());
-                            updateRow(selectedRow, updatedUserStockInfo);
+                            tableModel.removeRow(selectedRow);
+                            if (updatedUserStockInfo != null) {
+                                updateRow(selectedRow, updatedUserStockInfo);
+                            }
+                            tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
                         } else {
                             System.out.println(res.getMessage());
                         }
@@ -105,7 +109,6 @@ public class UserStockPage extends JFrame {
     }
 
     public void updateRow(int selectedRow, UserStockInfo updatedUserStockInfo) {
-        tableModel.removeRow(selectedRow);
         Object[] updatedRowData = {
                 updatedUserStockInfo.getStockSymbol(),
                 updatedUserStockInfo.getStockName(),
@@ -115,7 +118,6 @@ public class UserStockPage extends JFrame {
                 updatedUserStockInfo.getUnrealizedProfit()
         };
         tableModel.insertRow(selectedRow, updatedRowData);
-        tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
     }
 
     public void loadData(UserController userController) {

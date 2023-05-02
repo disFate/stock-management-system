@@ -27,14 +27,14 @@ public class ManageAccountPage extends JFrame {
     private JButton backButton;
     private JButton registerButton;
     private JButton profitButton;
+    private User currentUser;
 
     public ManageAccountPage(UserController userController, UserMenuPage userMenuPage) {
-        User currentUser = userController.getUserInfo(CurrentUser.getCurrentUser().getId());
-
         setTitle("Manage Account");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
+        currentUser = userController.getUserInfo(CurrentUser.getCurrentUser().getId());
 
         mainPanel = new JPanel(new BorderLayout());
         setContentPane(mainPanel);
@@ -75,9 +75,8 @@ public class ManageAccountPage extends JFrame {
         });
 
         if (!currentUser.getApproved().equals(User.Approved.APPROVED)) {
-            registerButton = new JButton("Register");
+            registerButton = new JButton("Upgrade");
             rightPanel.add(registerButton, BorderLayout.EAST);
-
             registerButton.addActionListener(e -> {
             });
         }
@@ -92,4 +91,14 @@ public class ManageAccountPage extends JFrame {
         });
     }
 
+    public void loadData(UserController userController) {
+        currentUser = userController.getUserInfo(CurrentUser.getCurrentUser().getId());
+
+        nameLabel.setText("Name: " + currentUser.getName());
+        emailLabel.setText("Email: " + currentUser.getEmail());
+        roleLabel.setText("Role: " + currentUser.getRole().toString());
+        approvedLabel.setText("Approved: " + currentUser.getApproved().toString());
+        balanceLabel.setText("Balance: " + currentUser.getBalance().toString());
+        realizedProfitLabel.setText("Realized Profit: " + currentUser.getRealizedProfit().toString());
+    }
 }
