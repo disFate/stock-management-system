@@ -9,10 +9,14 @@ package dao;
 import model.Entity.Stock;
 import model.Entity.Transaction;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 public interface IStockDAO {
     List<Stock> getAllStocks();
+
+    Stock getStockById(int id);
 
     List<Stock> getUserStocks(int userId);
 
@@ -23,4 +27,10 @@ public interface IStockDAO {
     void deleteStock(String Company);
 
     void editStock(String oldName, String symbol, String Company, double Price, int amount);
+
+    public void startTransaction(Connection connection) throws SQLException;
+
+    public void commitTransaction(Connection connection) throws SQLException;
+
+    public void rollbackTransaction(Connection connection) throws SQLException;
 }

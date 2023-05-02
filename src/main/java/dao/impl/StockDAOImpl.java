@@ -51,6 +51,31 @@ public class StockDAOImpl implements IStockDAO {
     }
 
     @Override
+    public Stock getStockById(int id) {
+        Stock stock = null;
+        String query = "SELECT * FROM stocks WHERE isDeleted = false and id = ?";
+
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                String symbol = resultSet.getString("symbol");
+                String name = resultSet.getString("name");
+                BigDecimal price = resultSet.getBigDecimal("price");
+                int amount = resultSet.getInt("amount");
+
+                stock = new Stock(id, symbol, name, price, amount);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return stock;
+    }
+
+    @Override
     public List<Stock> getUserStocks(int userId) {
         List<Stock> stocks = new ArrayList<>();
         String query = "SELECT s.id, s.symbol, s.name, s.price, us.quantity " +
@@ -150,4 +175,17 @@ public class StockDAOImpl implements IStockDAO {
             e.printStackTrace();
         }
     }
+
+    public void startTransaction(Connection connection) throws SQLException {
+        connection.setAutoCommit(false);
+    }
+
+    public void commitTransaction(Connection connection) throws SQLException {
+        connection.commit();
+    }
+
+    public void rollbackTransaction(Connection connection) throws SQLException {
+        connection.rollback();
+    }
+
 }

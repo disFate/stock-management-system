@@ -82,16 +82,28 @@ public class User {
         return approved;
     }
 
-    public void setApproved(Approved approved) {
-        this.approved = approved;
-    }
-
     public BigDecimal getBalance() {
         return balance;
     }
 
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
+    }
+
+    public Approved getApproved() {
+        return approved;
+    }
+
+    public void setApproved(Approved approved) {
+        this.approved = approved;
+    }
+
+    public BigDecimal getRealizedProfit() {
+        return realizedProfit;
+    }
+
+    public void setRealizedProfit(BigDecimal realizedProfit) {
+        this.realizedProfit = realizedProfit;
     }
 
     public enum Role {

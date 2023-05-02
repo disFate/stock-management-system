@@ -3,11 +3,9 @@ package dao.impl;
 import DataSource.DatabaseConnectionPool;
 import dao.IUserDAO;
 import model.DTO.UserStockInfo;
-import model.Entity.Transaction;
 import model.Entity.User;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,38 +22,27 @@ import java.util.List;
 public class UserDAOImpl implements IUserDAO {
 
     @Override
-    public void updateStockQuantity(int userId, int stockId, int transactionQuantity, Transaction.Type type) throws SQLException {
-        String updateSql = "UPDATE user_stocks SET quantity = quantity - ? WHERE user_id = ? AND stock_id = ?";
-        try (Connection connection = DatabaseConnectionPool.getConnection();
-             PreparedStatement statement = connection.prepareStatement(updateSql)) {
-            statement.setInt(1, transactionQuantity);
-            statement.setInt(2, userId);
-            statement.setInt(3, stockId);
-            statement.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        String checkSql = "SELECT quantity FROM user_stocks WHERE user_id = ? AND stock_id = ?";
-        int updatedQuantity = 0;
-        try (Connection connection = DatabaseConnectionPool.getConnection();
-             PreparedStatement statement = connection.prepareStatement(checkSql)) {
-            statement.setInt(1, userId);
-            statement.setInt(2, stockId);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                updatedQuantity = resultSet.getInt("quantity");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (updatedQuantity == 0) {
-            String deleteSql = "DELETE FROM user_stocks WHERE user_id = ? AND stock_id = ?";
+    public void updateStockQuantity(int userId, int stockId, int newQuantity) throws SQLException {
+        String updateSql;
+        if (newQuantity == 0) {
+            updateSql = "DELETE FROM user_stocks WHERE user_id = ? AND stock_id = ?";
             try (Connection connection = DatabaseConnectionPool.getConnection();
-                 PreparedStatement statement = connection.prepareStatement(deleteSql)) {
+                 PreparedStatement statement = connection.prepareStatement(updateSql)) {
                 statement.setInt(1, userId);
                 statement.setInt(2, stockId);
+                statement.executeUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            updateSql = "INSERT INTO user_stocks (quantity, user_id, stock_id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE quantity = ?";
+
+            try (Connection connection = DatabaseConnectionPool.getConnection();
+                 PreparedStatement statement = connection.prepareStatement(updateSql)) {
+                statement.setInt(1, newQuantity);
+                statement.setInt(2, userId);
+                statement.setInt(3, stockId);
+                statement.setInt(4, newQuantity);
                 statement.executeUpdate();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -77,31 +64,14 @@ public class UserDAOImpl implements IUserDAO {
     }
 
     @Override
-    public void updateAverageCost(int userId, int stockId, int quantity, BigDecimal price) {
-        try (Connection connection = DatabaseConnectionPool.getConnection()) {
-            String query = "SELECT quantity, average_cost FROM user_stocks WHERE user_id = ? AND stock_id = ?";
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setInt(1, userId);
-            statement.setInt(2, stockId);
-
-            ResultSet resultSet = statement.executeQuery();
-
-            if (resultSet.next()) {
-                int currentQuantity = resultSet.getInt("quantity") - quantity;
-                BigDecimal currentAverageCost = resultSet.getBigDecimal("average_cost");
-
-                BigDecimal newAverageCost = currentAverageCost.multiply(BigDecimal.valueOf(currentQuantity))
-                        .add(price.multiply(BigDecimal.valueOf(quantity)))
-                        .divide(BigDecimal.valueOf(currentQuantity + quantity), 2, RoundingMode.HALF_UP);
-
-                String updateQuery = "UPDATE user_stocks SET average_cost = ? WHERE user_id = ? AND stock_id = ?";
-                PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
-                updateStatement.setBigDecimal(1, newAverageCost);
-                updateStatement.setInt(2, userId);
-                updateStatement.setInt(3, stockId);
-
-                updateStatement.executeUpdate();
-            }
+    public void updateAverageCost(int userId, int stockId, BigDecimal newAverageCost) {
+        String query = "UPDATE user_stocks SET average_cost = ? WHERE user_id = ? AND stock_id = ?";
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);) {
+            statement.setBigDecimal(1, newAverageCost);
+            statement.setInt(2, userId);
+            statement.setInt(3, stockId);
+            statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -129,9 +99,42 @@ public class UserDAOImpl implements IUserDAO {
         return users;
     }
 
-    public List<UserStockInfo> getUserStockInfo(int userId) {
+    public UserStockInfo getUserStockInfo(int userId, int stockId) {
+        UserStockInfo userStockInfo = null;
+        String query = "SELECT u.id as user_id, s.id as stock_id, s.symbol, s.name, us.average_cost, us.quantity, s.price, " +
+                "((s.price - us.average_cost) * us.quantity) as unrealized_profit " +
+                "FROM user_stocks us " +
+                "JOIN users u ON u.id = us.user_id " +
+                "JOIN stocks s ON s.id = us.stock_id " +
+                "WHERE us.user_id = ? AND us.stock_id = ?";
+
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, userId);
+            statement.setInt(2, stockId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                String stockSymbol = resultSet.getString("symbol");
+                String stockName = resultSet.getString("name");
+                BigDecimal averageCost = resultSet.getBigDecimal("average_cost");
+                int quantity = resultSet.getInt("quantity");
+                BigDecimal unrealizedProfit = resultSet.getBigDecimal("unrealized_profit");
+                BigDecimal price = resultSet.getBigDecimal("price");
+
+                userStockInfo = new UserStockInfo(userId, stockId, stockSymbol, stockName, averageCost, quantity, unrealizedProfit, price);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return userStockInfo;
+    }
+
+    public List<UserStockInfo> getUserStockInfoByUserId(int userId) {
         List<UserStockInfo> userStockInfoList = new ArrayList<>();
-        String query = "SELECT u.id as user_id, s.id as stock_id, s.symbol, s.name, us.average_cost, us.quantity, " +
+        String query = "SELECT u.id as user_id, s.id as stock_id, s.symbol, s.name, us.average_cost, us.quantity, s.price, " +
                 "((s.price - us.average_cost) * us.quantity) as unrealized_profit " +
                 "FROM user_stocks us " +
                 "JOIN users u ON u.id = us.user_id " +
@@ -152,8 +155,9 @@ public class UserDAOImpl implements IUserDAO {
                 BigDecimal averageCost = resultSet.getBigDecimal("average_cost");
                 int quantity = resultSet.getInt("quantity");
                 BigDecimal unrealizedProfit = resultSet.getBigDecimal("unrealized_profit");
+                BigDecimal price = resultSet.getBigDecimal("price");
 
-                UserStockInfo userStockInfo = new UserStockInfo(uid, stockId, stockSymbol, stockName, averageCost, quantity, unrealizedProfit);
+                UserStockInfo userStockInfo = new UserStockInfo(uid, stockId, stockSymbol, stockName, averageCost, quantity, unrealizedProfit, price);
                 userStockInfoList.add(userStockInfo);
             }
         } catch (SQLException e) {
@@ -191,34 +195,18 @@ public class UserDAOImpl implements IUserDAO {
     }
 
     @Override
-    public void updateRealizedProfit(int userId, int stockId, int quantity, BigDecimal price) {
+    public void updateRealizedProfit(int userId, BigDecimal newRealizedProfit) {
         try (Connection connection = DatabaseConnectionPool.getConnection()) {
-            String query = "SELECT quantity, average_cost, realized_profit FROM users INNER JOIN user_stocks ON users.id = user_stocks.user_id WHERE user_id = ? AND stock_id = ?";
+            String query = "UPDATE users SET realized_profit = ? WHERE id = ?";
             PreparedStatement statement = connection.prepareStatement(query);
-            statement.setInt(1, userId);
-            statement.setInt(2, stockId);
+            statement.setBigDecimal(1, newRealizedProfit);
+            statement.setInt(2, userId);
 
-            ResultSet resultSet = statement.executeQuery();
-
-            if (resultSet.next()) {
-                BigDecimal averageCost = resultSet.getBigDecimal("average_cost");
-                BigDecimal realizedProfit = resultSet.getBigDecimal("realized_profit");
-
-                BigDecimal profitFromSale = (price.subtract(averageCost)).multiply(BigDecimal.valueOf(quantity));
-                BigDecimal newRealizedProfit = realizedProfit.add(profitFromSale);
-
-                String updateQuery = "UPDATE users SET realized_profit = ? WHERE id = ?";
-                PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
-                updateStatement.setBigDecimal(1, newRealizedProfit);
-                updateStatement.setInt(2, userId);
-
-                updateStatement.executeUpdate();
-            }
+            statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
 
     public void updateUserApproved(int userId) {
         String query = "UPDATE users SET approved = 'approved' WHERE id = ?";
@@ -279,4 +267,17 @@ public class UserDAOImpl implements IUserDAO {
 
         return users;
     }
+
+    public void startTransaction(Connection connection) throws SQLException {
+        connection.setAutoCommit(false);
+    }
+
+    public void commitTransaction(Connection connection) throws SQLException {
+        connection.commit();
+    }
+
+    public void rollbackTransaction(Connection connection) throws SQLException {
+        connection.rollback();
+    }
+
 }

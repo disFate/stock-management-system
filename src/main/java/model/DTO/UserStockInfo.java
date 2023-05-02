@@ -13,12 +13,13 @@ public class UserStockInfo {
     private String stockSymbol;
     private String stockName;
     private BigDecimal averageCost;
+    private BigDecimal price;
     private int quantity;
     private BigDecimal unrealizedProfit;
 
     // Add constructors, getters and setters here
 
-    public UserStockInfo(int userId, int stockId, String stockSymbol, String stockName, BigDecimal averageCost, int quantity, BigDecimal unrealizedProfit) {
+    public UserStockInfo(int userId, int stockId, String stockSymbol, String stockName, BigDecimal averageCost, int quantity, BigDecimal unrealizedProfit, BigDecimal price) {
         this.userId = userId;
         this.stockId = stockId;
         this.stockSymbol = stockSymbol;
@@ -26,9 +27,18 @@ public class UserStockInfo {
         this.averageCost = averageCost;
         this.quantity = quantity;
         this.unrealizedProfit = unrealizedProfit;
+        this.price = price;
     }
 
     public UserStockInfo() {
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public int getUserId() {

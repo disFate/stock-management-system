@@ -1,15 +1,10 @@
 package view.userPages;
 
-/**
- * @Author: Tsuna
- * @Date: 2023-04-21-15:28
- * @Description:
- */
-
 import common.Response;
 import controller.StockController;
 import controller.UserController;
-import model.Entity.Stock;
+import model.DTO.UserStockInfo;
+import session.CurrentUser;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -21,10 +16,11 @@ import java.util.List;
 
 public class UserStockPage extends JFrame {
 
-    List<Stock> userStocks;
+    List<UserStockInfo> userStockInfos;
     private JPanel mainPanel;
     private JTable userStockTable;
     private JButton backButton;
+    private JButton refreshButton;
     private JButton sellButton;
     private JScrollPane scrollPane;
     private DefaultTableModel tableModel;
@@ -39,24 +35,29 @@ public class UserStockPage extends JFrame {
         setContentPane(mainPanel);
         mainPanel.setLayout(new BorderLayout());
 
-        String[] columnNames = {"symbol", "company", "price", "quantity"};
+        String[] columnNames = {"symbol", "company", "averageCost", "quantity", "price", "unrealizedProfit"};
         tableModel = new DefaultTableModel(columnNames, 0);
         userStockTable = new JTable(tableModel);
         userStockTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        //loadData(stockController);
+        //loadData(userController);
 
         scrollPane = new JScrollPane(userStockTable);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottomPanel.add(leftPanel, BorderLayout.WEST);
+        bottomPanel.add(rightPanel, BorderLayout.EAST);
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         backButton = new JButton("back");
-        bottomPanel.add(backButton, BorderLayout.WEST);
-
+        leftPanel.add(backButton);
+        refreshButton = new JButton("refresh");
+        rightPanel.add(refreshButton);
         sellButton = new JButton("sell");
-        bottomPanel.add(sellButton, BorderLayout.EAST);
+        rightPanel.add(sellButton);
 
         backButton.addActionListener(new ActionListener() {
             @Override
@@ -65,6 +66,7 @@ public class UserStockPage extends JFrame {
                 setVisible(false);
             }
         });
+
         // Add ActionListener to sellButton
         sellButton.addActionListener(new ActionListener() {
             @Override
@@ -72,22 +74,15 @@ public class UserStockPage extends JFrame {
                 int selectedRow = userStockTable.getSelectedRow();
                 if (selectedRow != -1) {
                     // Perform sell operation with the selected stock
-                    Stock stock = userStocks.stream().filter(s -> s.getSymbol().equals(userStockTable.
-                            getValueAt(selectedRow, 0))).findFirst().orElse(null);
+                    UserStockInfo userStockInfo = userStockInfos.get(selectedRow);
                     //todo a pop up window to select quantity
                     int quantity = 1;
 
                     try {
-                        Response res = userController.sellStock(stock, quantity);
-                        if (res.isSuccess() == true) {
-                            stock.setAmount(stock.getAmount() - quantity);
-                            tableModel.setValueAt(stock.getAmount(), selectedRow, 3);
-                            tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
-//                            Thread thread = new Thread(() -> {
-//                                userMenuPage.notifyUpdate(0, stockController);
-//                            });
-//                            thread.start();
-
+                        Response res = userController.sellStock(userStockInfo.getStockId(), quantity);
+                        if (res.isSuccess()) {
+                            UserStockInfo updatedUserStockInfo = userController.getUserStockInfo(userStockInfo.getUserId(), userStockInfo.getStockId());
+                            updateRow(selectedRow, updatedUserStockInfo);
                         } else {
                             System.out.println(res.getMessage());
                         }
@@ -101,14 +96,42 @@ public class UserStockPage extends JFrame {
             }
         });
 
+        refreshButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loadData(userController);
+            }
+        });
     }
 
-    public void loadData(StockController stockController) {
+    public void updateRow(int selectedRow, UserStockInfo updatedUserStockInfo) {
+        tableModel.removeRow(selectedRow);
+        Object[] updatedRowData = {
+                updatedUserStockInfo.getStockSymbol(),
+                updatedUserStockInfo.getStockName(),
+                updatedUserStockInfo.getAverageCost(),
+                updatedUserStockInfo.getQuantity(),
+                updatedUserStockInfo.getPrice(),
+                updatedUserStockInfo.getUnrealizedProfit()
+        };
+        tableModel.insertRow(selectedRow, updatedRowData);
+        tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
+    }
+
+    public void loadData(UserController userController) {
         tableModel.setRowCount(0);
-        userStocks = stockController.getUserStocks();
-        for (Stock stock : userStocks) {
-            Object[] rowData = {stock.getSymbol(), stock.getName(), stock.getPrice(), stock.getAmount()};
+        userStockInfos = userController.getUnrealizedProfit(CurrentUser.getCurrentUser().getId());
+        for (UserStockInfo userStockInfo : userStockInfos) {
+            Object[] rowData = {
+                    userStockInfo.getStockSymbol(),
+                    userStockInfo.getStockName(),
+                    userStockInfo.getAverageCost(),
+                    userStockInfo.getQuantity(),
+                    userStockInfo.getPrice(),
+                    userStockInfo.getUnrealizedProfit()
+            };
             tableModel.addRow(rowData);
         }
     }
+
 }

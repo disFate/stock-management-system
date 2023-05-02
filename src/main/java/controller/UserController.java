@@ -11,6 +11,7 @@ import model.Entity.User;
 import session.CurrentUser;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,19 +31,37 @@ public class UserController {
         return userDAO.getRegisteredUsers();
     }
 
-    public List<User>getPendingUsers(){return userDAO.getPendingUsers();
+    public List<User> getPendingUsers() {
+        return userDAO.getPendingUsers();
 
     }
 
-    public int getPendingCount(){
+    public User getUserInfo(int id) {
+        return userDAO.getUserById(id);
+    }
+
+    public int getPendingCount() {
         return userDAO.getCountPending();
     }
 
-    public void updateUserDenied(int userID){userDAO.updateUserDenied(userID);}
-    public void updateUserApproved(int userID){userDAO.updateUserApproved(userID);}
-    public Response buyStock(Stock stock, int buyQuantity) throws SQLException {
+    public void updateUserDenied(int userID) {
+        userDAO.updateUserDenied(userID);
+    }
+
+    public UserStockInfo getUserStockInfo(int userId, int stockId) {
+        return userDAO.getUserStockInfo(userId, stockId);
+    }
+
+
+    public void updateUserApproved(int userID) {
+        userDAO.updateUserApproved(userID);
+    }
+
+    public Response buyStock(int stockId, int buyQuantity) throws SQLException {
         //error: 1. no user log in 2. no enough money 3. no eno
         User currentUser = userDAO.getUserById(CurrentUser.getCurrentUser().getId());
+        Stock stock = stockDAO.getStockById(stockId);
+        UserStockInfo userStockInfo = userDAO.getUserStockInfo(currentUser.getId(), stock.getId());
         if (currentUser == null) {
             return new Response(false, "No user is currently logged in");
         }
@@ -53,11 +72,20 @@ public class UserController {
         if (buyQuantity > stock.getAmount()) {
             return new Response(false, "only " + stock.getAmount() + " left in market");
         }
-        BigDecimal newBalance = currentUser.getBalance().subtract(totalCost);
 
+        BigDecimal newBalance = currentUser.getBalance().subtract(totalCost);
         userDAO.updateBalance(currentUser.getId(), newBalance);
-        userDAO.updateStockQuantity(currentUser.getId(), stock.getId(), buyQuantity, Transaction.Type.BUY);
-        userDAO.updateAverageCost(currentUser.getId(), stock.getId(), buyQuantity, stock.getPrice());
+
+        int currentQuantity = userStockInfo != null ? userStockInfo.getQuantity() : 0;
+        BigDecimal currentAverageCost = userStockInfo != null ? userStockInfo.getAverageCost() : BigDecimal.valueOf(0);
+
+        int newQuantity = currentQuantity + buyQuantity;
+        userDAO.updateStockQuantity(currentUser.getId(), stock.getId(), newQuantity);
+
+        BigDecimal newAverageCost = currentAverageCost.multiply(BigDecimal.valueOf(currentQuantity))
+                .add(stock.getPrice().multiply(BigDecimal.valueOf(buyQuantity)))
+                .divide(BigDecimal.valueOf(currentQuantity + buyQuantity), 2, RoundingMode.HALF_UP);
+        userDAO.updateAverageCost(currentUser.getId(), stock.getId(), newAverageCost);
 
         stockDAO.updateAmount(stock.getId(), buyQuantity, Transaction.Type.BUY);
 
@@ -73,8 +101,10 @@ public class UserController {
         return new Response(true, "bought successfully");
     }
 
-    public Response sellStock(Stock stock, int sellQuantity) throws SQLException {
+    public Response sellStock(int stockId, int sellQuantity) throws SQLException {
         User currentUser = userDAO.getUserById(CurrentUser.getCurrentUser().getId());
+        Stock stock = stockDAO.getStockById(stockId);
+        UserStockInfo userStockInfo = userDAO.getUserStockInfo(currentUser.getId(), stock.getId());
         if (currentUser == null) {
             return new Response(false, "No user is currently logged in");
         }
@@ -84,10 +114,16 @@ public class UserController {
 
         BigDecimal totalIncome = stock.getPrice().multiply(BigDecimal.valueOf(sellQuantity));
         BigDecimal newBalance = currentUser.getBalance().add(totalIncome);
-
         userDAO.updateBalance(currentUser.getId(), newBalance);
-        userDAO.updateStockQuantity(currentUser.getId(), stock.getId(), sellQuantity, Transaction.Type.SELL);
-        userDAO.updateRealizedProfit(currentUser.getId(), stock.getId(), sellQuantity, stock.getPrice());
+
+        int newQuantity = userStockInfo.getQuantity() - sellQuantity;
+        userDAO.updateStockQuantity(currentUser.getId(), stock.getId(), newQuantity);
+
+        BigDecimal currentAverageCost = userStockInfo == null ? BigDecimal.valueOf(0) : userStockInfo.getAverageCost();
+        BigDecimal realizedProfit = currentUser.getRealizedProfit();
+        BigDecimal profitFromSale = (stock.getPrice().subtract(currentAverageCost)).multiply(BigDecimal.valueOf(sellQuantity));
+        BigDecimal newRealizedProfit = realizedProfit.add(profitFromSale);
+        userDAO.updateRealizedProfit(currentUser.getId(), newRealizedProfit);
 
         stockDAO.updateAmount(stock.getId(), sellQuantity, Transaction.Type.SELL);
 
@@ -103,7 +139,7 @@ public class UserController {
     }
 
     public List<UserStockInfo> getUnrealizedProfit(int userId) {
-        return userDAO.getUserStockInfo(userId);
+        return userDAO.getUserStockInfoByUserId(userId);
     }
 
 //    public

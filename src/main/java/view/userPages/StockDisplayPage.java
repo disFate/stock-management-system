@@ -6,6 +6,7 @@ package view.userPages;
  * @Description:
  */
 
+import common.Response;
 import controller.StockController;
 import controller.UserController;
 import model.Entity.Stock;
@@ -24,6 +25,7 @@ public class StockDisplayPage extends JFrame {
     private JPanel mainPanel;
     private JTable stockTable;
     private JButton backButton;
+    private JButton refreshButton;
     private JButton buyButton;
     private JScrollPane scrollPane;
     private DefaultTableModel tableModel;
@@ -53,13 +55,18 @@ public class StockDisplayPage extends JFrame {
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottomPanel.add(leftPanel, BorderLayout.WEST);
+        bottomPanel.add(rightPanel, BorderLayout.EAST);
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         backButton = new JButton("back");
-        bottomPanel.add(backButton, BorderLayout.WEST);
-
+        leftPanel.add(backButton);
+        refreshButton = new JButton("refresh");
+        rightPanel.add(refreshButton);
         buyButton = new JButton("buy");
-        bottomPanel.add(buyButton, BorderLayout.EAST);
+        rightPanel.add(buyButton);
 
         backButton.addActionListener(new ActionListener() {
             @Override
@@ -80,7 +87,8 @@ public class StockDisplayPage extends JFrame {
                     Stock stock = stocks.stream().filter(s -> s.getSymbol().equals(stockTable.
                             getValueAt(selectedRow, 0))).findFirst().orElse(null);
                     try {
-                        if (userController.buyStock(stock, quantity).isSuccess() == true) {
+                        Response res = userController.buyStock(stock.getId(), quantity);
+                        if (res.isSuccess() == true) {
                             stock.setAmount(stock.getAmount() - quantity);
                             tableModel.setValueAt(stock.getAmount(), selectedRow, 3);
                             tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
@@ -88,13 +96,21 @@ public class StockDisplayPage extends JFrame {
 //                                userMenuPage.notifyUpdate(1, stockController);
 //                            });
 //                            thread.start();
+                        } else {
+                            System.out.println(res.getMessage());
                         }
                     } catch (SQLException ex) {
                         throw new RuntimeException(ex);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(null, "please xselect a stock");
+                    JOptionPane.showMessageDialog(null, "please select a stock");
                 }
+            }
+        });
+        refreshButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loadData(stockController);
             }
         });
     }

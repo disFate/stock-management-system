@@ -5,7 +5,6 @@ import controller.UserController;
 import dao.impl.StockDAOImpl;
 import dao.impl.TransactionDAOImpl;
 import dao.impl.UserDAOImpl;
-import model.DTO.UserStockInfo;
 import model.Entity.User;
 import session.CurrentUser;
 
@@ -13,15 +12,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 public class UserMenuPage extends JFrame {
     private StockDisplayPage stockPage;//0
     private UserStockPage userStockPage;//1
+    private ManageAccountPage manageAccountPage;
 
     public UserMenuPage(StockController stockController, UserController userController) {
         stockPage = new StockDisplayPage(stockController, userController, this);
         userStockPage = new UserStockPage(stockController, userController, this);
+        manageAccountPage = new ManageAccountPage(userController, this);
 
         setTitle("Customer Stock Trading System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -58,13 +58,20 @@ public class UserMenuPage extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 userStockPage.setVisible(true);
-                userStockPage.loadData(stockController);
+                userStockPage.loadData(userController);
                 setVisible(false);
             }
         });
 
         JButton manageAccountButton = new JButton("Manage Account");
         manageAccountButton.setPreferredSize(new Dimension(200, 50));
+        manageAccountButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                manageAccountPage.setVisible(true);
+                setVisible(false);
+            }
+        });
 
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -90,18 +97,7 @@ public class UserMenuPage extends JFrame {
                 UserMenuPage userMenuPage = new UserMenuPage(new StockController(new StockDAOImpl(), new TransactionDAOImpl()), new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl()));
                 userMenuPage.setVisible(true);
                 UserController userController = new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl());
-                List<UserStockInfo> unrealizedProfit = userController.getUnrealizedProfit(CurrentUser.getCurrentUser().getId());
-                System.out.println(unrealizedProfit);
             }
         });
-    }
-
-    public void notifyUpdate(int page, StockController stockController) {
-        if (page == 0) {
-            stockPage.loadData(stockController);
-        }
-        if (page == 1) {
-            userStockPage.loadData(stockController);
-        }
     }
 }
