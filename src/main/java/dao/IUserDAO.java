@@ -33,6 +33,8 @@ public interface IUserDAO {
 
     void updateUserApproved(int userId);
 
+    void updateUserPending(int userId);
+
     void updateUserDenied(int userId);
 
     int getCountPending();

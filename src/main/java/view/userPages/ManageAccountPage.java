@@ -39,26 +39,54 @@ public class ManageAccountPage extends JFrame {
         mainPanel = new JPanel(new BorderLayout());
         setContentPane(mainPanel);
 
-        JPanel infoPanel = new JPanel(new GridLayout(6, 1));
+        JPanel infoPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 20, 10, 20);
         mainPanel.add(infoPanel, BorderLayout.CENTER);
+        Font labelFont = new Font("Arial", Font.PLAIN, 16);
 
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.LINE_START;
         nameLabel = new JLabel("Name: " + currentUser.getName());
-        infoPanel.add(nameLabel);
+        nameLabel.setFont(labelFont);
+        infoPanel.add(nameLabel, gbc);
 
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.LINE_START;
         emailLabel = new JLabel("Email: " + currentUser.getEmail());
-        infoPanel.add(emailLabel);
+        emailLabel.setFont(labelFont);
+        infoPanel.add(emailLabel, gbc);
 
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.LINE_START;
         roleLabel = new JLabel("Role: " + currentUser.getRole().toString());
-        infoPanel.add(roleLabel);
+        roleLabel.setFont(labelFont);
+        infoPanel.add(roleLabel, gbc);
 
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.LINE_START;
         approvedLabel = new JLabel("Approved: " + currentUser.getApproved().toString());
-        infoPanel.add(approvedLabel);
+        approvedLabel.setFont(labelFont);
+        infoPanel.add(approvedLabel, gbc);
 
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.LINE_START;
         balanceLabel = new JLabel("Balance: " + currentUser.getBalance().toString());
-        infoPanel.add(balanceLabel);
+        balanceLabel.setFont(labelFont);
+        infoPanel.add(balanceLabel, gbc);
 
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.LINE_START;
         realizedProfitLabel = new JLabel("Realized Profit: " + currentUser.getRealizedProfit().toString());
-        infoPanel.add(realizedProfitLabel);
+        realizedProfitLabel.setFont(labelFont);
+        infoPanel.add(realizedProfitLabel, gbc);
+
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -78,6 +106,7 @@ public class ManageAccountPage extends JFrame {
             registerButton = new JButton("Upgrade");
             rightPanel.add(registerButton, BorderLayout.EAST);
             registerButton.addActionListener(e -> {
+                userController.updateUserPending(currentUser.getId());
             });
         }
 

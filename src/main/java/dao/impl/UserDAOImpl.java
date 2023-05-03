@@ -219,6 +219,18 @@ public class UserDAOImpl implements IUserDAO {
         }
     }
 
+    @Override
+    public void updateUserPending(int userId) {
+        String query = "UPDATE users SET approved = 'pending' WHERE id = ?";
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);) {
+            statement.setInt(1, userId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void updateUserDenied(int userId) {
         String query = "UPDATE users SET approved = 'denied' WHERE id = ?";
         try (Connection connection = DatabaseConnectionPool.getConnection();
