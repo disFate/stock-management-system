@@ -14,10 +14,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
 
 public class ManageAccountPage extends JFrame {
     private JPanel mainPanel;
     private JPanel bottomPanel;
+    private JPanel rightPanel;
+    private JPanel leftPanel;
     private JLabel nameLabel;
     private JLabel emailLabel;
     private JLabel roleLabel;
@@ -26,7 +29,8 @@ public class ManageAccountPage extends JFrame {
     private JLabel realizedProfitLabel;
     private JButton backButton;
     private JButton registerButton;
-    private JButton profitButton;
+    private JButton withDrawButton;
+    private JButton depositButton;
     private User currentUser;
 
     public ManageAccountPage(UserController userController, UserMenuPage userMenuPage) {
@@ -88,9 +92,9 @@ public class ManageAccountPage extends JFrame {
         infoPanel.add(realizedProfitLabel, gbc);
 
 
-        JPanel bottomPanel = new JPanel(new BorderLayout());
-        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottomPanel = new JPanel(new BorderLayout());
+        leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.add(leftPanel, BorderLayout.WEST);
         bottomPanel.add(rightPanel, BorderLayout.EAST);
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
@@ -102,22 +106,69 @@ public class ManageAccountPage extends JFrame {
             this.setVisible(false);
         });
 
+        depositButton = new JButton("Deposit");
+        rightPanel.add(depositButton);
+        depositButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showDepositDialog(true, userController);
+            }
+        });
+
+        withDrawButton = new JButton("Withdraw");
+        rightPanel.add(withDrawButton);
+        withDrawButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showDepositDialog(false, userController);
+            }
+        });
+
         if (!currentUser.getApproved().equals(User.Approved.APPROVED)) {
             registerButton = new JButton("Upgrade");
             rightPanel.add(registerButton, BorderLayout.EAST);
             registerButton.addActionListener(e -> {
                 userController.updateUserPending(currentUser.getId());
+                currentUser.setApproved(User.Approved.PENDING);
             });
         }
+    }
 
-        profitButton = new JButton("Profit");
-        rightPanel.add(profitButton);
-        profitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+    private void showDepositDialog(boolean isDeposit, UserController userController) {
+        JTextField amountField = new JTextField(10);
+        JTextField cardNumberField = new JTextField(16);
+        JTextField cvvField = new JTextField(3);
+        JTextField expireDateField = new JTextField(5);
 
+        JPanel depositPanel = new JPanel(new GridLayout(5, 2));
+        depositPanel.add(new JLabel("Amount:"));
+        depositPanel.add(amountField);
+        depositPanel.add(new JLabel("Card Number:"));
+        depositPanel.add(cardNumberField);
+        depositPanel.add(new JLabel("CVV:"));
+        depositPanel.add(cvvField);
+        depositPanel.add(new JLabel("Expire Date (MM/YY):"));
+        depositPanel.add(expireDateField);
+
+        int result = JOptionPane.showConfirmDialog(null, depositPanel, isDeposit ? "Deposit" : "Withdraw",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            // Process the deposit or withdrawal
+            // Get the input values
+            String amount = amountField.getText();
+            String cardNumber = cardNumberField.getText();
+            String cvv = cvvField.getText();
+            String expireDate = expireDateField.getText();
+
+            // Perform validation and process the transaction
+            if (isDeposit) {
+                userController.deposit(CurrentUser.getCurrentUser().getId(), new BigDecimal(amount));
+            } else {
+                userController.withDraw(CurrentUser.getCurrentUser().getId(), new BigDecimal(amount));
             }
-        });
+            loadData(userController);
+        }
     }
 
     public void loadData(UserController userController) {
@@ -129,5 +180,9 @@ public class ManageAccountPage extends JFrame {
         approvedLabel.setText("Approved: " + currentUser.getApproved().toString());
         balanceLabel.setText("Balance: " + currentUser.getBalance().toString());
         realizedProfitLabel.setText("Realized Profit: " + currentUser.getRealizedProfit().toString());
+
+        if (currentUser.getApproved().equals(User.Approved.APPROVED) && registerButton != null) {
+            registerButton.setVisible(false);
+        }
     }
 }

@@ -61,6 +61,16 @@ public class UserController {
         userDAO.updateUserPending(userId);
     }
 
+    public void withDraw(int userId, BigDecimal amount) {
+        BigDecimal balance = userDAO.getUserById(userId).getBalance();
+        userDAO.updateBalance(userId, balance.subtract(amount));
+    }
+
+    public void deposit(int userId, BigDecimal amount) {
+        BigDecimal balance = userDAO.getUserById(userId).getBalance();
+        userDAO.updateBalance(userId, balance.add(amount));
+    }
+
     public Response buyStock(int stockId, int buyQuantity) throws SQLException {
         //error: 1. no user log in 2. no enough money 3. no eno
         User currentUser = userDAO.getUserById(CurrentUser.getCurrentUser().getId());

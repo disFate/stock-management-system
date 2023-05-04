@@ -10,6 +10,8 @@ import common.Response;
 import controller.StockController;
 import controller.UserController;
 import model.Entity.Stock;
+import model.Entity.User;
+import session.CurrentUser;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -80,33 +82,41 @@ public class StockDisplayPage extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = stockTable.getSelectedRow();
+                if (!CurrentUser.getCurrentUser().getApproved().equals(User.Approved.APPROVED)) {
+                    JOptionPane.showMessageDialog(null, "only trading account can buy and sell stocks", "Warning", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
                 if (selectedRow != -1) {
                     // Perform buy operation with the selected stock
-                    //todo pop up window to select quantity
-                    int quantity = 1;
-                    Stock stock = stocks.stream().filter(s -> s.getSymbol().equals(stockTable.
-                            getValueAt(selectedRow, 0))).findFirst().orElse(null);
-                    try {
-                        Response res = userController.buyStock(stock.getId(), quantity);
-                        if (res.isSuccess() == true) {
-                            stock.setAmount(stock.getAmount() - quantity);
-                            tableModel.setValueAt(stock.getAmount(), selectedRow, 3);
-                            tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
-//                            Thread thread = new Thread(() -> {
-//                                userMenuPage.notifyUpdate(1, stockController);
-//                            });
-//                            thread.start();
-                        } else {
-                            System.out.println(res.getMessage());
+                    // Ask user for quantity
+                    String input = JOptionPane.showInputDialog(null, "Enter the quantity you want to buy:", "Buy Stock", JOptionPane.QUESTION_MESSAGE);
+                    if (input != null && !input.isEmpty()) {
+                        try {
+                            int quantity = Integer.parseInt(input);
+                            Stock stock = stocks.stream().filter(s -> s.getSymbol().equals(stockTable.
+                                    getValueAt(selectedRow, 0))).findFirst().orElse(null);
+                            try {
+                                Response res = userController.buyStock(stock.getId(), quantity);
+                                if (res.isSuccess() == true) {
+                                    stock.setAmount(stock.getAmount() - quantity);
+                                    tableModel.setValueAt(stock.getAmount(), selectedRow, 3);
+                                    tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
+                                } else {
+                                    System.out.println(res.getMessage());
+                                }
+                            } catch (SQLException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(null, "Invalid quantity entered. Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
                         }
-                    } catch (SQLException ex) {
-                        throw new RuntimeException(ex);
                     }
                 } else {
                     JOptionPane.showMessageDialog(null, "please select a stock");
                 }
             }
         });
+
         refreshButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

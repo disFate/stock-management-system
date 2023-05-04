@@ -75,8 +75,9 @@ public class UserStockPage extends JFrame {
                 if (selectedRow != -1) {
                     // Perform sell operation with the selected stock
                     UserStockInfo userStockInfo = userStockInfos.get(selectedRow);
+                    String input = JOptionPane.showInputDialog(null, "Enter the quantity you want to sell:", "Sell Stock", JOptionPane.QUESTION_MESSAGE);
                     //todo a pop up window to select quantity
-                    int quantity = 1;
+                    int quantity = Integer.parseInt(input);
 
                     try {
                         Response res = userController.sellStock(userStockInfo.getStockId(), quantity);

@@ -1,8 +1,10 @@
 package session;
 
+import controller.UserController;
+import dao.impl.StockDAOImpl;
+import dao.impl.TransactionDAOImpl;
+import dao.impl.UserDAOImpl;
 import model.Entity.User;
-
-import java.math.BigDecimal;
 
 /**
  * @Author: Tsuna
@@ -13,7 +15,8 @@ public class CurrentUser {
     private static User currentUser;
 
     static {
-        currentUser = new User(2, "dong", "tsuna@bu.edu", "123", User.Role.CUSTOMER, User.Approved.APPROVED, BigDecimal.valueOf(100000l), BigDecimal.valueOf(0));
+        // todo create currentUser when login. Sometimes user should be updated when they update or withdraw, we can remind user to log in again
+        currentUser = new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl()).getUserInfo(2);
     }
 
     public CurrentUser() {
