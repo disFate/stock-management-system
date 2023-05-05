@@ -88,9 +88,8 @@ public class UserStockPage extends JFrame {
                                 updateRow(selectedRow, updatedUserStockInfo);
                             }
                             tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
-                        } else {
-                            System.out.println(res.getMessage());
                         }
+                        JOptionPane.showMessageDialog(null, res.getMessage());
                     } catch (SQLException ex) {
                         throw new RuntimeException(ex);
                     }

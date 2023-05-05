@@ -89,10 +89,11 @@ public class UserMenuPage extends JFrame {
         messagesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                showMessagesDialog(messageController);
+                showMessagesDialog(messageController, messagesButton);
             }
         });
-
+        Thread thread = new Thread();
+        updateMessageButton(messageController, messagesButton);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -111,7 +112,7 @@ public class UserMenuPage extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    private void showMessagesDialog(MessageController messageController) {
+    private void showMessagesDialog(MessageController messageController, JButton messagesButton) {
         JDialog messagesDialog = new JDialog(this, "User Messages", true);
         messagesDialog.setSize(800, 600);
         messagesDialog.setLocationRelativeTo(this);
@@ -138,11 +139,8 @@ public class UserMenuPage extends JFrame {
             }
         });
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        messagesDialog.add(buttonPanel, BorderLayout.SOUTH);
-
         JButton readButton = new JButton("Mark as Read");
-        buttonPanel.add(readButton);
+
         readButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -152,7 +150,7 @@ public class UserMenuPage extends JFrame {
                     if (!selectedMessage.isRead()) {
                         messageController.markMessageAsRead(selectedMessage.getId());
                         tableModel.setValueAt("read", selectedRow, 2);
-                        // updateMessageButton(); // Update message count on the message button
+                        updateMessageButton(messageController, messagesButton); // Update message count on the message button
                     }
                 } else {
                     JOptionPane.showMessageDialog(null, "Please select a message to mark as read.");
@@ -160,20 +158,20 @@ public class UserMenuPage extends JFrame {
             }
         });
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottomPanel.add(readButton);
         bottomPanel.add(closeButton);
         messagesDialog.add(bottomPanel, BorderLayout.SOUTH);
-
         messagesDialog.setVisible(true);
     }
 
-//    public void updateMessageButton() {
-//        int unreadMessagesCount = messageController.getUnreadMessagesByUserId(CurrentUser.getCurrentUser().getId()).size();
-//        if (unreadMessagesCount > 0) {
-//            messageButton.setText("Messages (" + unreadMessagesCount + ")");
-//        } else {
-//            messageButton.setText("Messages");
-//        }
-//    }
+    public void updateMessageButton(MessageController messageController, JButton messageButton) {
+        int unreadMessagesCount = messageController.getUnreadMessagesByUserId(CurrentUser.getCurrentUser().getId()).size();
+        if (unreadMessagesCount > 0) {
+            messageButton.setText("Messages (" + unreadMessagesCount + ")");
+        } else {
+            messageButton.setText("Messages");
+        }
+    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {

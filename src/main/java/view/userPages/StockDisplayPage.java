@@ -101,9 +101,8 @@ public class StockDisplayPage extends JFrame {
                                     stock.setAmount(stock.getAmount() - quantity);
                                     tableModel.setValueAt(stock.getAmount(), selectedRow, 3);
                                     tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
-                                } else {
-                                    System.out.println(res.getMessage());
                                 }
+                                JOptionPane.showMessageDialog(null, res.getMessage());
                             } catch (SQLException ex) {
                                 throw new RuntimeException(ex);
                             }
