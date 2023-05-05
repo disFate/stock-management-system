@@ -74,6 +74,7 @@ public class UserRequestsPage extends JFrame {
                 if (selectedRow != -1) {
                     int userID = (int) tableModel.getValueAt(selectedRow, 0);
                     userController.updateUserApproved(userID);
+                    tableModel.removeRow(selectedRow);
                 } else {
                     JOptionPane.showMessageDialog(null, "please select a user");
                 }
@@ -87,6 +88,7 @@ public class UserRequestsPage extends JFrame {
                 if (selectedRow != -1) {
                     int userID = (int) tableModel.getValueAt(selectedRow, 0);
                     userController.updateUserDenied(userID);
+                    tableModel.removeRow(selectedRow);
                 } else {
                     JOptionPane.showMessageDialog(null, "please select a user");
                 }

@@ -76,7 +76,7 @@ public class addEditDeleteStocks extends JFrame {
                     String symbol = (String) tableModel.getValueAt(selectedRow, 0);
 
                     BigDecimal bigDprice = (BigDecimal) tableModel.getValueAt(selectedRow, 2);
-                    double price = bigDprice.doubleValue();
+                    double price = bigDprice.doubleValue();//(double) tableModel.getValueAt(selectedRow, 2);//bigDprice.doubleValue();
                     int amount = (int) tableModel.getValueAt(selectedRow, 3);
 
                     // create the edit stock panel
@@ -108,8 +108,17 @@ public class addEditDeleteStocks extends JFrame {
                         // get the values entered by the user
                         String newSymbol = symbolField.getText();
                         String newCompany = companyField.getText();
-                        double newPrice = Double.parseDouble(priceField.getText());
-                        int newAmount = Integer.parseInt(amountField.getText());
+                        double newPrice;
+                        int newAmount;
+                        try {
+                            newPrice = Double.parseDouble(priceField.getText());
+                            newAmount = Integer.parseInt(amountField.getText());
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid number.");
+                            return;
+                        }
+
+                        BigDecimal newPriceDec = BigDecimal.valueOf(newPrice);
 
                         // call the editStock method in stockController
                         stockController.editStock(oldName, newSymbol, newCompany, newPrice, newAmount);
@@ -118,7 +127,7 @@ public class addEditDeleteStocks extends JFrame {
                         Object[] rowData = {newSymbol, newCompany, newPrice, newAmount};
                         tableModel.setValueAt(newSymbol, selectedRow, 0);
                         tableModel.setValueAt(newCompany, selectedRow, 1);
-                        tableModel.setValueAt(newPrice, selectedRow, 2);
+                        tableModel.setValueAt(newPriceDec, selectedRow, 2);
                         tableModel.setValueAt(newAmount, selectedRow, 3);
                         tableModel.fireTableDataChanged(); // force the JTable to redraw itself
                     }
@@ -146,7 +155,7 @@ public class addEditDeleteStocks extends JFrame {
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                // create the add stock panel
                 JPanel panel = new JPanel(new GridLayout(4, 2, 5, 5));
                 panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -172,19 +181,28 @@ public class addEditDeleteStocks extends JFrame {
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
                 if (result == JOptionPane.OK_OPTION) {
-                    // get the values entered by the user
+                    try {
+                        // get the values entered by the user
+                        String symbol = symbolField.getText();
+                        String company = companyField.getText();
+                        double price = Double.parseDouble(priceField.getText());
+                        int amount = Integer.parseInt(amountField.getText());
 
-                    String symbol = symbolField.getText();
-                    String company = companyField.getText();
-                    double price = Double.parseDouble(priceField.getText());
-                    int amount = Integer.parseInt(amountField.getText());
-                    stockController.addStock(symbol, company, price, amount);
-                    Object[] rowData = {symbol, company, price, amount};
-                    tableModel.addRow(rowData); // update the tableModel with the new stock data
-                    tableModel.fireTableDataChanged(); // force the JTable to redraw itself
+                        // call the addStock method in stockController
+                        stockController.addStock(symbol, company, price, amount);
+
+                        // update the tableModel with the new stock data
+                        Object[] rowData = {symbol, company, price, amount};
+                        tableModel.addRow(rowData);
+                        tableModel.fireTableDataChanged(); // force the JTable to redraw itself
+                    } catch (NumberFormatException ex) {
+                        // handle invalid input for price or amount
+                        JOptionPane.showMessageDialog(null, "Invalid input for price or amount. Please try again.");
+                    }
                 }
             }
         });
+
 
 
     }

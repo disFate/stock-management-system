@@ -1,20 +1,37 @@
 package view.managerPages;
 
 import controller.UserController;
+import dao.impl.MessageDAOImpl;
 import dao.impl.StockDAOImpl;
 import dao.impl.TransactionDAOImpl;
 import dao.impl.UserDAOImpl;
+import dao.impl.MessageDAOImpl;
+import model.Entity.Message;
 import model.Entity.User;
+import controller.MessageController;
+import controller.MessageController;
+import controller.StockController;
+import controller.UserController;
+import dao.impl.MessageDAOImpl;
+import dao.impl.StockDAOImpl;
+import dao.impl.TransactionDAOImpl;
+import dao.impl.UserDAOImpl;
+import model.Entity.Message;
+import model.Entity.User;
+import session.CurrentUser;
+import view.userPages.UserMenuPage;
 
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
+
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class UserNotifyPage extends JFrame {
@@ -30,7 +47,7 @@ public class UserNotifyPage extends JFrame {
     private DefaultTableModel tableModel;
 
 
-    public UserNotifyPage(UserController userController) {
+    public UserNotifyPage(UserController userController, MessageController messageController) {
         setTitle("Users");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -44,36 +61,12 @@ public class UserNotifyPage extends JFrame {
         userTable = new JTable(tableModel);
 
         userTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        userTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent event) {
-                // Ignore extra messages.
-                if (event.getValueIsAdjusting()) return;
 
-                ListSelectionModel lsm = (ListSelectionModel)event.getSource();
-                int[] selectedRows = userTable.getSelectedRows();
-                int numRows = tableModel.getRowCount();
-
-                for (int i = 0; i < numRows; i++) {
-                    if (!contains(selectedRows, i)) {
-                        lsm.removeSelectionInterval(i, i);
-                    }
-                }
-            }
-
-            private boolean contains(int[] array, int value) {
-                for (int i : array) {
-                    if (i == value) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-        });
 
 
 
         List<User> registeredUsers = userController.getRegisteredUsers();
+
 
         for (User user : registeredUsers) {
             Object[] rowData = {user.getId(), user.getName(), user.getEmail(), user.getBalance()};
@@ -95,10 +88,56 @@ public class UserNotifyPage extends JFrame {
         notifyButton = new JButton("notify");
 
 
-//        JTextField message = new JTextField();
-//        message.setColumns(40);
-//        buttonPanel.add(message);
+
+
+        JButton selectAllButton = new JButton("Select All");
+        selectAllButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                userTable.selectAll();
+            }
+        });
+
+        JButton showAll = new JButton("Show All Registered Users");
+        showAll.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Get the list of derivative users from the user controller
+                List<User> derivativeUsers = userController.getRegisteredUsers();
+
+                // Remove all rows from the table
+                tableModel.setRowCount(0);
+
+                // Add the derivative users to the table
+                for (User user : derivativeUsers) {
+                    Object[] rowData = {user.getId(), user.getName(), user.getEmail(), user.getBalance()};
+                    tableModel.addRow(rowData);
+                }
+            }
+        });
+
+        JButton showDerivativeButton = new JButton("Show Qualified Derivative Traders");
+        showDerivativeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Get the list of derivative users from the user controller
+                List<User> derivativeUsers = userController.getDerivativeUsers();
+
+                // Remove all rows from the table
+                tableModel.setRowCount(0);
+
+                // Add the derivative users to the table
+                for (User user : derivativeUsers) {
+                    Object[] rowData = {user.getId(), user.getName(), user.getEmail(), user.getBalance()};
+                    tableModel.addRow(rowData);
+                }
+            }
+        });
+        buttonPanel.add(showAll);
+        buttonPanel.add(showDerivativeButton);
+        buttonPanel.add(selectAllButton);
         buttonPanel.add(notifyButton);
+
         notifyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -135,7 +174,10 @@ public class UserNotifyPage extends JFrame {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             String message = messageTextArea.getText();
-                            //TODO: send the message to the selected users
+                            for (int row : selectedRows) {
+                                int userID = (int)tableModel.getValueAt(row, 0);
+                                messageController.createMessage(userID, message);
+                            }
                             messageFrame.dispose();
                         }
                     });
@@ -152,7 +194,15 @@ public class UserNotifyPage extends JFrame {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             UserController userController = new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl());
-            new UserNotifyPage(userController).setVisible(true);
+
+            try {
+                MessageController messageController = new MessageController(new MessageDAOImpl());
+                new UserNotifyPage(userController, messageController).setVisible(true);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+
         });
     }
 

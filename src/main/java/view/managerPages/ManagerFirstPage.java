@@ -2,10 +2,13 @@ package view.managerPages;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import javax.swing.*;
 
+import controller.MessageController;
 import controller.StockController;
 import controller.UserController;
+import dao.impl.MessageDAOImpl;
 import dao.impl.StockDAOImpl;
 import dao.impl.TransactionDAOImpl;
 import dao.impl.UserDAOImpl;
@@ -43,7 +46,9 @@ public class ManagerFirstPage extends JFrame {
 
         addEditDeleteStocks stocksPage = new addEditDeleteStocks(new StockController(new StockDAOImpl(), new TransactionDAOImpl()));
 
-        UserNotifyPage userPage = new UserNotifyPage(new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl()));
+
+
+
         notificationButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -68,7 +73,13 @@ public class ManagerFirstPage extends JFrame {
         usersButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                userPage.setVisible(true);
+                try {
+                    MessageController messageController = new MessageController(new MessageDAOImpl());
+                    UserNotifyPage userPage = new UserNotifyPage(new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl()), new MessageController(new MessageDAOImpl()));
+                    userPage.setVisible(true);
+                } catch (SQLException i) {
+                    throw new RuntimeException(i);
+                }
                 setVisible(false);
             }
         });

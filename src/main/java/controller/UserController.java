@@ -31,6 +31,7 @@ public class UserController {
         return userDAO.getRegisteredUsers();
     }
 
+    public List<User>getDerivativeUsers(){return userDAO.getDerivativeUsers();}
     public List<User> getPendingUsers() {
         return userDAO.getPendingUsers();
 

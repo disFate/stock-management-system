@@ -19,7 +19,7 @@ public class MessageController {
         message.setUserId(userId);
         message.setMessage(messageContent);
         message.setRead(false);
-        message.setMessageDate((Timestamp) new Date());
+        message.setMessageDate(new Timestamp(new Date().getTime()));
         return messageDAO.createMessage(message);
     }
 

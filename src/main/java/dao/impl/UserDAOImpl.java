@@ -232,7 +232,7 @@ public class UserDAOImpl implements IUserDAO {
     }
 
     public void updateUserDenied(int userId) {
-        String query = "UPDATE users SET approved = 'denied' WHERE id = ?";
+        String query = "UPDATE users SET approved = 'declined' WHERE id = ?";
         try (Connection connection = DatabaseConnectionPool.getConnection();
              PreparedStatement statement = connection.prepareStatement(query);) {
             statement.setInt(1, userId);
@@ -256,6 +256,28 @@ public class UserDAOImpl implements IUserDAO {
         }
 
         return count;
+    }
+
+    public List<User> getDerivativeUsers() {
+        List<User> users = new ArrayList<>();
+        String query = "SELECT * FROM users WHERE realized_profit > 10000";
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                String email = resultSet.getString("email");
+                BigDecimal balance = resultSet.getBigDecimal("balance");
+
+                User newUser = new User(id, name, email, balance);
+                users.add(newUser);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return users;
     }
 
     public List<User> getPendingUsers() {

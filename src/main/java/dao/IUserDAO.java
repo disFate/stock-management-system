@@ -22,6 +22,7 @@ public interface IUserDAO {
     void updateAverageCost(int userId, int stockId, BigDecimal newAverageCost);
 
     List<User> getRegisteredUsers();
+    List<User> getDerivativeUsers();
 
     UserStockInfo getUserStockInfo(int userId, int stockId);
 
