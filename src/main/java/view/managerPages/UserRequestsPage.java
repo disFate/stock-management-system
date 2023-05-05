@@ -29,6 +29,7 @@ public class UserRequestsPage extends JFrame {
         setTitle("User Requests");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         mainPanel = new JPanel();
         setContentPane(mainPanel);
@@ -65,6 +66,15 @@ public class UserRequestsPage extends JFrame {
 
         buttonPanel.add(approveButton);
         buttonPanel.add(denyButton);
+
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e){
+                ManagerFirstPage managerFirstPage = new ManagerFirstPage( new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl()));
+                managerFirstPage.setVisible(true);
+                setVisible(false);
+            }
+
+        });
 
 
         approveButton.addActionListener(new ActionListener() {

@@ -42,6 +42,7 @@ public class UserNotifyPage extends JFrame {
         setTitle("Users");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         mainPanel = new JPanel();
         setContentPane(mainPanel);
@@ -74,6 +75,15 @@ public class UserNotifyPage extends JFrame {
 
         backButton = new JButton("back");
         bottomPanel.add(backButton, BorderLayout.WEST);
+
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e){
+                ManagerFirstPage managerFirstPage = new ManagerFirstPage( new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl()));
+                managerFirstPage.setVisible(true);
+                setVisible(false);
+            }
+
+        });
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.add(buttonPanel, BorderLayout.EAST);
