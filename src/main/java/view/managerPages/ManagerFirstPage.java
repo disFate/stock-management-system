@@ -26,11 +26,11 @@ public class ManagerFirstPage extends JFrame {
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridBagLayout());
-        setResizable(false);
+        setResizable(true);
 
         GridBagConstraints gbc = new GridBagConstraints();
 
-        JLabel welcomeLabel = new JLabel("Welcome, ");
+        JLabel welcomeLabel = new JLabel("Welcome");
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 24));
         gbc.gridx = 0;
         gbc.gridy = 0;
