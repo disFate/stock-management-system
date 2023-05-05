@@ -166,5 +166,12 @@ public class UserController {
         return userDAO.getUserStockInfoByUserId(userId);
     }
 
+    public User getUserById(int id){
+        return userDAO.getUserById(id);
+    }
+
+    public void addUser(User user) {
+        userDAO.addUser(user);
+    }
 //    public
 }

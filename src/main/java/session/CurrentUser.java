@@ -22,6 +22,11 @@ public class CurrentUser {
     public CurrentUser() {
     }
 
+    public static User setCurrentUser(User user) {
+        currentUser = user;
+        return currentUser;
+    }
+
     public static User getCurrentUser() {
         return currentUser;
     }

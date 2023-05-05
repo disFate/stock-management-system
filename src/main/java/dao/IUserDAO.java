@@ -47,4 +47,6 @@ public interface IUserDAO {
     public void commitTransaction(Connection connection) throws SQLException;
 
     public void rollbackTransaction(Connection connection) throws SQLException;
+
+    void addUser(User user);
 }
