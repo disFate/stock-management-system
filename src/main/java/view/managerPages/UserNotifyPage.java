@@ -9,17 +9,7 @@ import dao.impl.MessageDAOImpl;
 import model.Entity.Message;
 import model.Entity.User;
 import controller.MessageController;
-import controller.MessageController;
-import controller.StockController;
-import controller.UserController;
-import dao.impl.MessageDAOImpl;
-import dao.impl.StockDAOImpl;
-import dao.impl.TransactionDAOImpl;
-import dao.impl.UserDAOImpl;
-import model.Entity.Message;
-import model.Entity.User;
-import session.CurrentUser;
-import view.userPages.UserMenuPage;
+
 
 
 import java.awt.*;
@@ -31,6 +21,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -75,6 +66,8 @@ public class UserNotifyPage extends JFrame {
 
         scrollPane = new JScrollPane(userTable);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        mainPanel.add(topPanel, BorderLayout.NORTH);
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
@@ -103,18 +96,128 @@ public class UserNotifyPage extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Get the list of derivative users from the user controller
-                List<User> derivativeUsers = userController.getRegisteredUsers();
+                List<User> registeredUsers = userController.getRegisteredUsers();
 
                 // Remove all rows from the table
                 tableModel.setRowCount(0);
 
                 // Add the derivative users to the table
-                for (User user : derivativeUsers) {
+                for (User user : registeredUsers) {
                     Object[] rowData = {user.getId(), user.getName(), user.getEmail(), user.getBalance()};
                     tableModel.addRow(rowData);
                 }
             }
         });
+
+        JButton viewButton = new JButton("view");
+        viewButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = userTable.getSelectedRow();
+                if (selectedRow == -1) {
+                    JOptionPane.showMessageDialog(mainPanel, "Please select a user to view.");
+                } else if (userTable.getSelectedRowCount() > 1) {
+                    JOptionPane.showMessageDialog(mainPanel, "Please select only one user to view.");
+                } else {
+                    int userID = (int)tableModel.getValueAt(selectedRow, 0);
+                    User selectedUser = userController.getUserInfo(userID);
+                    JFrame viewFrame = new JFrame();
+                    viewFrame.setTitle("View User");
+                    viewFrame.setSize(400, 300);
+                    viewFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    viewFrame.setLocationRelativeTo(null);
+
+                    JPanel viewPanel = new JPanel(new GridBagLayout());
+
+                    GridBagConstraints c = new GridBagConstraints();
+                    c.anchor = GridBagConstraints.LINE_END;
+                    c.insets = new Insets(5, 5, 5, 5);
+
+                    JLabel idLabel = new JLabel("ID:");
+                    c.gridx = 0;
+                    c.gridy = 0;
+                    viewPanel.add(idLabel, c);
+
+                    JTextField idField = new JTextField();
+                    idField.setEditable(false);
+                    idField.setText(String.valueOf(selectedUser.getId()));
+                    c.gridx = 1;
+                    c.gridy = 0;
+                    viewPanel.add(idField, c);
+
+                    JLabel nameLabel = new JLabel("Name:");
+                    c.gridx = 0;
+                    c.gridy = 1;
+                    viewPanel.add(nameLabel, c);
+
+                    JTextField nameField = new JTextField();
+                    nameField.setEditable(false);
+                    nameField.setText(selectedUser.getName());
+                    c.gridx = 1;
+                    c.gridy = 1;
+                    viewPanel.add(nameField, c);
+
+                    JLabel emailLabel = new JLabel("Email:");
+                    c.gridx = 0;
+                    c.gridy = 2;
+                    viewPanel.add(emailLabel, c);
+
+                    JTextField emailField = new JTextField();
+                    emailField.setEditable(false);
+                    emailField.setText(selectedUser.getEmail());
+                    c.gridx = 1;
+                    c.gridy = 2;
+                    viewPanel.add(emailField, c);
+
+                    JLabel balanceLabel = new JLabel("Balance:");
+                    c.gridx = 0;
+                    c.gridy = 3;
+                    viewPanel.add(balanceLabel, c);
+
+                    JTextField balanceField = new JTextField();
+                    balanceField.setEditable(false);
+                    balanceField.setText(selectedUser.getBalance().toString());
+                    c.gridx = 1;
+                    c.gridy = 3;
+                    viewPanel.add(balanceField, c);
+
+                    JLabel profitLabel = new JLabel("Realized Profit:");
+                    c.gridx = 0;
+                    c.gridy = 4;
+                    viewPanel.add(profitLabel, c);
+
+                    JTextField profitField = new JTextField();
+                    profitField.setEditable(false);
+                    profitField.setText(selectedUser.getRealizedProfit().toString());
+                    c.gridx = 1;
+                    c.gridy = 4;
+                    viewPanel.add(profitField, c);
+
+                    JButton blockButton = new JButton("Block User");
+                    c.gridx = 0;
+                    c.gridy = 5;
+                    c.gridwidth = 2;
+                    c.anchor = GridBagConstraints.CENTER;
+                    viewPanel.add(blockButton, c);
+
+                    blockButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            int selectedUserId = selectedUser.getId();
+                            userController.updateUserDenied(userID);
+                            tableModel.removeRow(selectedRow);
+                            viewFrame.dispose();
+                        }
+                    });
+
+                    viewFrame.getContentPane().add(viewPanel);
+
+                    viewFrame.setVisible(true);
+                }
+            }
+        });
+
+
 
         JButton showDerivativeButton = new JButton("Show Qualified Derivative Traders");
         showDerivativeButton.addActionListener(new ActionListener() {
@@ -133,10 +236,12 @@ public class UserNotifyPage extends JFrame {
                 }
             }
         });
-        buttonPanel.add(showAll);
-        buttonPanel.add(showDerivativeButton);
+        topPanel.add(showAll);
+        topPanel.add(showDerivativeButton);
         buttonPanel.add(selectAllButton);
         buttonPanel.add(notifyButton);
+        buttonPanel.add(viewButton);
+
 
         notifyButton.addActionListener(new ActionListener() {
             @Override
