@@ -314,4 +314,24 @@ public class UserDAOImpl implements IUserDAO {
         connection.rollback();
     }
 
+    public void addUser(User user) {
+        String sql = "INSERT INTO users (name, email, password, role, approved, balance, realized_profit) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, user.getName());
+            statement.setString(2, user.getEmail());
+            statement.setString(3, user.getPassword());
+            statement.setString(4, user.getRole().toString().toLowerCase());
+            statement.setString(5, user.isApproved().toString().toLowerCase());
+            statement.setBigDecimal(6, user.getBalance());
+            statement.setBigDecimal(7, BigDecimal.ZERO );
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

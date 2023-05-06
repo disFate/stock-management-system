@@ -129,7 +129,7 @@ public class ManageAccountPage extends JFrame {
             rightPanel.add(registerButton, BorderLayout.EAST);
             registerButton.addActionListener(e -> {
                 userController.updateUserPending(currentUser.getId());
-                currentUser.setApproved(User.Approved.PENDING);
+                approvedLabel.setText("Approved: PENDING");
             });
         }
     }

@@ -31,7 +31,10 @@ public class UserController {
         return userDAO.getRegisteredUsers();
     }
 
-    public List<User>getDerivativeUsers(){return userDAO.getDerivativeUsers();}
+    public List<User> getDerivativeUsers() {
+        return userDAO.getDerivativeUsers();
+    }
+
     public List<User> getPendingUsers() {
         return userDAO.getPendingUsers();
 
@@ -80,6 +83,9 @@ public class UserController {
         if (currentUser == null) {
             return new Response(false, "No user is currently logged in");
         }
+        if (!currentUser.getApproved().equals(User.Approved.APPROVED)) {
+            return new Response(false, "only trading account can buy stock");
+        }
         BigDecimal totalCost = stock.getPrice().multiply(BigDecimal.valueOf(buyQuantity));
         if (currentUser.getBalance().compareTo(totalCost) < 0) {
             return new Response(false, "Lack of money");
@@ -113,7 +119,7 @@ public class UserController {
                 stock.getPrice(),
                 LocalDateTime.now()
         ));
-        return new Response(true, "bought successfully");
+        return new Response(true, "bought successfully, you get " + buyQuantity + " " + stock.getSymbol() + " with " + totalCost + " cost.");
     }
 
     public Response sellStock(int stockId, int sellQuantity) throws SQLException {
@@ -122,6 +128,9 @@ public class UserController {
         UserStockInfo userStockInfo = userDAO.getUserStockInfo(currentUser.getId(), stock.getId());
         if (currentUser == null) {
             return new Response(false, "No user is currently logged in");
+        }
+        if (!currentUser.getApproved().equals(User.Approved.APPROVED)) {
+            return new Response(false, "only trading account can sell stock");
         }
         if (sellQuantity > stock.getAmount()) {
             return new Response(false, "Lack of stocks in account");
@@ -150,12 +159,19 @@ public class UserController {
                 stock.getPrice(),
                 LocalDateTime.now())
         );
-        return new Response(true, "sold successfully");
+        return new Response(true, "sold successfully, you get " + totalIncome + " by selling " + sellQuantity + " " + stock.getSymbol() + " and earn " + profitFromSale + " profit.");
     }
 
     public List<UserStockInfo> getUnrealizedProfit(int userId) {
         return userDAO.getUserStockInfoByUserId(userId);
     }
 
+    public User getUserById(int id){
+        return userDAO.getUserById(id);
+    }
+
+    public void addUser(User user) {
+        userDAO.addUser(user);
+    }
 //    public
 }
