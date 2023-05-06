@@ -6,10 +6,11 @@ import dao.impl.StockDAOImpl;
 import dao.impl.TransactionDAOImpl;
 import dao.impl.UserDAOImpl;
 import dao.impl.MessageDAOImpl;
+import model.DTO.UserStockInfo;
 import model.Entity.Message;
 import model.Entity.User;
 import controller.MessageController;
-
+import session.CurrentUser;
 
 
 import java.awt.*;
@@ -31,6 +32,7 @@ public class UserNotifyPage extends JFrame {
     private JTable userTable;
     private JButton backButton;
     private JButton notifyButton;
+    List<UserStockInfo> userStockInfos;
 
 
     private JTextField message;
@@ -210,6 +212,61 @@ public class UserNotifyPage extends JFrame {
                     c.anchor = GridBagConstraints.CENTER;
                     viewPanel.add(blockButton, c);
 
+                    JButton viewUnrealizedProfitsButton = new JButton("View Unrealized Profits");
+                    c.gridx = 0;
+                    c.gridy = 6;
+                    c.gridwidth = 2;
+                    c.anchor = GridBagConstraints.CENTER;
+                    viewPanel.add(viewUnrealizedProfitsButton, c);
+
+                    viewUnrealizedProfitsButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            int selectedRow = userTable.getSelectedRow();
+                            if (selectedRow == -1) {
+                                JOptionPane.showMessageDialog(mainPanel, "Please select a user to view.");
+                            } else {
+                                int userID = (int)tableModel.getValueAt(selectedRow, 0);
+                                List<UserStockInfo> userStockInfos = userController.getUnrealizedProfit(userID);
+                                if (userStockInfos.isEmpty()) {
+                                    JOptionPane.showMessageDialog(mainPanel, "This user does not have any purchased stocks");
+                                } else {
+                                    JFrame profitsFrame = new JFrame();
+                                    profitsFrame.setTitle("Unrealized Profits");
+                                    profitsFrame.setSize(600, 400);
+                                    profitsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                                    profitsFrame.setLocationRelativeTo(null);
+
+                                    JPanel profitsPanel = new JPanel(new BorderLayout());
+
+                                    JTable profitsTable = new JTable(new DefaultTableModel(
+                                            new Object[][] {},
+                                            new Object[] {"Symbol", "Name", "Avg. Cost", "Quantity", "Price", "Unrealized Profit"}
+                                    ));
+
+                                    for (UserStockInfo userStockInfo : userStockInfos) {
+                                        Object[] rowData = {
+                                                userStockInfo.getStockSymbol(),
+                                                userStockInfo.getStockName(),
+                                                userStockInfo.getAverageCost(),
+                                                userStockInfo.getQuantity(),
+                                                userStockInfo.getPrice(),
+                                                userStockInfo.getUnrealizedProfit()
+                                        };
+                                        ((DefaultTableModel)profitsTable.getModel()).addRow(rowData);
+                                    }
+
+                                    profitsPanel.add(new JScrollPane(profitsTable), BorderLayout.CENTER);
+
+                                    profitsFrame.getContentPane().add(profitsPanel);
+
+                                    profitsFrame.setVisible(true);
+                                }
+                            }
+                        }
+                    });
+
+
                     blockButton.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -304,6 +361,22 @@ public class UserNotifyPage extends JFrame {
         });
 
 
+    }
+
+    public void loadData(UserController userController) {
+
+        userStockInfos = userController.getUnrealizedProfit(CurrentUser.getCurrentUser().getId());
+        for (UserStockInfo userStockInfo : userStockInfos) {
+            Object[] rowData = {
+                    userStockInfo.getStockSymbol(),
+                    userStockInfo.getStockName(),
+                    userStockInfo.getAverageCost(),
+                    userStockInfo.getQuantity(),
+                    userStockInfo.getPrice(),
+                    userStockInfo.getUnrealizedProfit()
+            };
+
+        }
     }
 
     public static void main(String[] args) {
