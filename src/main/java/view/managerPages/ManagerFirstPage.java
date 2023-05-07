@@ -12,6 +12,7 @@ import dao.impl.MessageDAOImpl;
 import dao.impl.StockDAOImpl;
 import dao.impl.TransactionDAOImpl;
 import dao.impl.UserDAOImpl;
+import view.HomePage;
 
 public class ManagerFirstPage extends JFrame {
 
@@ -45,8 +46,6 @@ public class ManagerFirstPage extends JFrame {
         UserRequestsPage requestPage = new UserRequestsPage(new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl()));
 
         addEditDeleteStocks stocksPage = new addEditDeleteStocks(new StockController(new StockDAOImpl(), new TransactionDAOImpl()));
-
-
 
 
         notificationButton.addActionListener(new ActionListener() {
@@ -84,6 +83,18 @@ public class ManagerFirstPage extends JFrame {
             }
         });
 
+        JButton logoutButton = new JButton("Log Out");
+        logoutButton.setPreferredSize(new Dimension(200, 50));
+
+        logoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String[] args = {};
+                HomePage.main(args);
+                setVisible(false);
+            }
+        });
+
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 0, 0);
@@ -95,11 +106,18 @@ public class ManagerFirstPage extends JFrame {
         gbc.gridy = 3;
         add(usersButton, gbc);
 
+        gbc.gridy = 4;
+        add(logoutButton, gbc);
+
         getContentPane().setBackground(new Color(235, 235, 235));
 
 
         setLocationRelativeTo(null);
+
+
+
     }
+
 
     public static void main(String[] args) {
         System.out.println("Running page");
