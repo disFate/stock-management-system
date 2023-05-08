@@ -1,11 +1,10 @@
 package view;
+
 import javax.swing.*;
 import java.awt.*;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 public class WelcomePanel extends JPanel {
+
     public WelcomePanel(JPanel mainPanel) {
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
