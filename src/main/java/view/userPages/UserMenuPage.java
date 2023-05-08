@@ -3,31 +3,25 @@ package view.userPages;
 import controller.MessageController;
 import controller.StockController;
 import controller.UserController;
-import dao.impl.MessageDAOImpl;
-import dao.impl.StockDAOImpl;
-import dao.impl.TransactionDAOImpl;
-import dao.impl.UserDAOImpl;
 import model.Entity.Message;
 import model.Entity.User;
 import session.CurrentUser;
-import view.CustomerLogin;
+import view.HomePage;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.util.List;
 
 public class UserMenuPage extends JFrame {
     private StockDisplayPage stockPage;//0
     private UserStockPage userStockPage;//1
     private ManageAccountPage manageAccountPage;
-    private CustomerLogin customerLogin;
 
-    public UserMenuPage(CustomerLogin customerLogin, StockController stockController, UserController userController, MessageController messageController) {
-        this.customerLogin = customerLogin;
+
+    public UserMenuPage(StockController stockController, UserController userController, MessageController messageController) {
         stockPage = new StockDisplayPage(stockController, userController, this);
         userStockPage = new UserStockPage(stockController, userController, this);
         manageAccountPage = new ManageAccountPage(userController, this);
@@ -105,7 +99,9 @@ public class UserMenuPage extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 UserMenuPage.this.setVisible(false);
-                // 返回到登录页面的代码将在这里添加
+                CurrentUser.setCurrentUser(null);
+                String[] args = {};
+                HomePage.main(args);
             }
         });
 
@@ -191,20 +187,20 @@ public class UserMenuPage extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                UserMenuPage userMenuPage = null;
-                try {
-                    userMenuPage = new UserMenuPage(new StockController(new StockDAOImpl(), new TransactionDAOImpl()), new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl()), new MessageController(new MessageDAOImpl()));
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-                userMenuPage.setVisible(true);
-                UserController userController = new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl());
-            }
-        });
-    }
+//    public static void main(String[] args) {
+//        SwingUtilities.invokeLater(new Runnable() {
+//            @Override
+//            public void run() {
+//                UserMenuPage userMenuPage = null;
+//                try {
+//                    userMenuPage = new UserMenuPage(new StockController(new StockDAOImpl(), new TransactionDAOImpl()), new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl()), new MessageController(new MessageDAOImpl()));
+//                } catch (SQLException e) {
+//                    throw new RuntimeException(e);
+//                }
+//                userMenuPage.setVisible(true);
+//                UserController userController = new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl());
+//            }
+//        });
+//    }
 
 }

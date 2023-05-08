@@ -75,13 +75,13 @@ public class CustomerLogin extends JPanel {
 
             // Set current user
             CurrentUser.setCurrentUser(user);
-
+            CustomerLogin customerLoginPage = this;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     UserMenuPage userMenuPage = null;
                     try {
-                        userMenuPage = new UserMenuPage(this, new StockController(new StockDAOImpl(), new TransactionDAOImpl()), userController, new MessageController(new MessageDAOImpl()));
+                        userMenuPage = new UserMenuPage(new StockController(new StockDAOImpl(), new TransactionDAOImpl()), userController, new MessageController(new MessageDAOImpl()));
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
                     }
