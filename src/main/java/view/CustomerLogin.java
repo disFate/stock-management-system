@@ -6,9 +6,14 @@ import controller.UserController;
 import dao.IUserDAO;
 import model.Entity.User;
 import controller.*;
+import view.userPages.*;
+import dao.impl.*;
+import dao.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
+
 import session.*;
 
 public class CustomerLogin extends JPanel {
@@ -25,7 +30,7 @@ public class CustomerLogin extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        add(new JLabel("User ID:"), gbc);
+        add(new JLabel("Email:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -55,9 +60,10 @@ public class CustomerLogin extends JPanel {
             char[] passwordCharArray = passwordField.getPassword();
             password = new String(passwordCharArray);
 
-            User user = userController.getUserInfo(Integer.parseInt(userId));
+            //User user = userController.getUserInfo(Integer.parseInt(userId));
+            User user = userController.getUserInfo(userId);
             if (user == null) {
-                JOptionPane.showMessageDialog(this, "Invalid ID");
+                JOptionPane.showMessageDialog(this, "Invalid Email");
                 return;
             }
             if (!user.getPassword().equals(password)) {
@@ -72,13 +78,26 @@ public class CustomerLogin extends JPanel {
             // Set current user
             CurrentUser.setCurrentUser(user);
 
-            // Create a UserProfile panel with the logged-in user and add it to the mainPanel
-            UserProfile userProfile = new UserProfile(mainPanel,user);
-            mainPanel.add(userProfile, "UserProfile");
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    UserMenuPage userMenuPage = null;
+                    try {
+                        userMenuPage = new UserMenuPage(new StockController(new StockDAOImpl(), new TransactionDAOImpl()), userController, new MessageController(new MessageDAOImpl()));
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    userMenuPage.setVisible(true);
+                }
+            });
 
-            // Switch to the UserProfile screen
-            CardLayout layout = (CardLayout) mainPanel.getLayout();
-            layout.show(mainPanel, "UserProfile");
+            // Add the UserMenuPage to the mainPanel
+            //mainPanel.add(userMenuPage, "UserMenuPage");
+
+            // Show the UserMenuPage
+            //CardLayout layout = (CardLayout) mainPanel.getLayout();
+            //layout.show(mainPanel, "UserMenuPage");
+
         });
         add(loginButton, gbc);
 

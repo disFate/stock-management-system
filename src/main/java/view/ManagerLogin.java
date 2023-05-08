@@ -6,6 +6,7 @@ import controller.UserController;
 import dao.IUserDAO;
 import model.Entity.User;
 import controller.*;
+import view.managerPages.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,7 +24,7 @@ public class ManagerLogin extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        add(new JLabel("Manager ID:"), gbc);
+        add(new JLabel("Manager Email:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -53,9 +54,9 @@ public class ManagerLogin extends JPanel {
             char[] passwordCharArray = passwordField.getPassword();
             password = new String(passwordCharArray);
 
-            User user = userController.getUserInfo(Integer.parseInt(managerId));
+            User user = userController.getUserInfo(managerId);
             if (user == null) {
-                JOptionPane.showMessageDialog(this, "Invalid ID");
+                JOptionPane.showMessageDialog(this, "Invalid Email");
                 return;
             }
             if (!user.getPassword().equals(password)) {
@@ -70,13 +71,9 @@ public class ManagerLogin extends JPanel {
             // Set current user
             CurrentUser.setCurrentUser(user);
 
-            // Create a UserProfile panel with the logged-in user and add it to the mainPanel
-            UserProfile userProfile = new UserProfile(mainPanel,user);
-            mainPanel.add(userProfile, "UserProfile");
+            ManagerFirstPage managerFirstPage = new ManagerFirstPage(userController);
+            managerFirstPage.setVisible(true);
 
-            // Switch to the UserProfile screen
-            CardLayout layout = (CardLayout) mainPanel.getLayout();
-            layout.show(mainPanel, "UserProfile");
         });
         add(loginButton, gbc);
 

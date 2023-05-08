@@ -23,15 +23,15 @@ public class SignUp extends JPanel {
 
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        add(new JLabel("User ID:"), gbc);
+        //gbc.gridx = 0;
+        //gbc.gridy = 0;
+        //add(new JLabel("User ID:"), gbc);
 
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        userIdField = new JTextField(15);
-        add(userIdField, gbc);
+        //gbc.gridx = 1;
+        //gbc.gridy = 0;
+        //gbc.fill = GridBagConstraints.HORIZONTAL;
+        //userIdField = new JTextField(15);
+        //add(userIdField, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -88,19 +88,22 @@ public class SignUp extends JPanel {
     }
 
     private void signUp(JPanel mainPanel, UserController userController) {
-        String userId = userIdField.getText();
+        //String userId = userIdField.getText();
         String name = nameField.getText();
         String email = emailField.getText();
         String password = new String(passwordField.getPassword());
 
         // Check if user already exists
-        if (userController.getUserById(Integer.parseInt(userId)) != null) {
+        //System.out.println(userController.getUserInfo(email).getName());
+        //System.out.println(userController.getUserInfo(email).getEmail());
+        //System.out.println(userController.getUserInfo(email).getPassword());
+        if (userController.getUserInfo(email) != null) {
             JOptionPane.showMessageDialog(this, "User already exists");
             return;
         }
 
         // Create new user
-        User user = new User(Integer.parseInt(userId), name, email, password, User.Role.CUSTOMER, User.Approved.PENDING, BigDecimal.ZERO ,BigDecimal.ZERO);
+        User user = new User(-1, name, email, password, User.Role.CUSTOMER, User.Approved.PENDING, BigDecimal.ZERO ,BigDecimal.ZERO);
 
         // Add user to database
         userController.addUser(user);
@@ -109,11 +112,14 @@ public class SignUp extends JPanel {
         CurrentUser.setCurrentUser(user);
 
         // Create a UserProfile panel with the logged-in user and add it to the mainPanel
-        UserProfile userProfile = new UserProfile(mainPanel,user);
-        mainPanel.add(userProfile, "UserProfile");
+        //UserProfile userProfile = new UserProfile(mainPanel,user);
+        //mainPanel.add(userProfile, "UserProfile");
 
         // Switch to the UserProfile screen
+        //CardLayout layout = (CardLayout) mainPanel.getLayout();
+        //layout.show(mainPanel, "Customer Login");
+
         CardLayout layout = (CardLayout) mainPanel.getLayout();
-        layout.show(mainPanel, "UserProfile");
+        layout.show(mainPanel, "Customer Login");
     }
 }

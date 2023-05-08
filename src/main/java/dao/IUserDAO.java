@@ -30,6 +30,8 @@ public interface IUserDAO {
 
     User getUserById(int userId);
 
+    User getUserByEmail(String email);
+
     void updateRealizedProfit(int userId, BigDecimal newRealizedProfit);
 
     void updateUserApproved(int userId);

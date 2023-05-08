@@ -334,4 +334,31 @@ public class UserDAOImpl implements IUserDAO {
             e.printStackTrace();
         }
     }
+
+    public User getUserByEmail(String email) {
+        User user = null;
+        String query = "SELECT * FROM users WHERE email = ?";
+
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, email);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                String password = resultSet.getString("password");
+                User.Role role = User.Role.valueOf(resultSet.getString("role").toUpperCase());
+                User.Approved approved = User.Approved.valueOf(resultSet.getString("approved").toUpperCase());
+                BigDecimal balance = resultSet.getBigDecimal("balance");
+                BigDecimal realizedProfit = resultSet.getBigDecimal("realized_profit");
+
+                user = new User(id, name, email, password, role, approved, balance, realizedProfit);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return user;
+    }
 }

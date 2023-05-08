@@ -44,6 +44,10 @@ public class UserController {
         return userDAO.getUserById(id);
     }
 
+    public User getUserInfo(String email) {
+        return userDAO.getUserByEmail(email);
+    }
+
     public int getPendingCount() {
         return userDAO.getCountPending();
     }
