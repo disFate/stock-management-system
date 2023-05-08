@@ -260,7 +260,7 @@ public class UserDAOImpl implements IUserDAO {
 
     public List<User> getDerivativeUsers() {
         List<User> users = new ArrayList<>();
-        String query = "SELECT * FROM users WHERE realized_profit > 10000 AND approved = 'registered'";
+        String query = "SELECT * FROM users WHERE realized_profit > 10000 AND approved = 'approved'";
         try (Connection connection = DatabaseConnectionPool.getConnection();
              PreparedStatement statement = connection.prepareStatement(query);) {
             ResultSet resultSet = statement.executeQuery();
