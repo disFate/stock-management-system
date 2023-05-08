@@ -1,20 +1,18 @@
 package view;
+
+import controller.MessageController;
+import controller.StockController;
+import controller.UserController;
+import dao.impl.MessageDAOImpl;
+import dao.impl.StockDAOImpl;
+import dao.impl.TransactionDAOImpl;
+import model.Entity.User;
+import session.CurrentUser;
+import view.userPages.UserMenuPage;
+
 import javax.swing.*;
 import java.awt.*;
-
-import controller.UserController;
-import dao.IUserDAO;
-import model.Entity.User;
-import controller.*;
-import view.userPages.*;
-import dao.impl.*;
-import dao.*;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.SQLException;
-
-import session.*;
 
 public class CustomerLogin extends JPanel {
     private String userId = "";
@@ -83,7 +81,7 @@ public class CustomerLogin extends JPanel {
                 public void run() {
                     UserMenuPage userMenuPage = null;
                     try {
-                        userMenuPage = new UserMenuPage(new StockController(new StockDAOImpl(), new TransactionDAOImpl()), userController, new MessageController(new MessageDAOImpl()));
+                        userMenuPage = new UserMenuPage(this, new StockController(new StockDAOImpl(), new TransactionDAOImpl()), userController, new MessageController(new MessageDAOImpl()));
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
                     }

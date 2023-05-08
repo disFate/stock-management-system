@@ -10,6 +10,7 @@ import dao.impl.UserDAOImpl;
 import model.Entity.Message;
 import model.Entity.User;
 import session.CurrentUser;
+import view.CustomerLogin;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -23,8 +24,10 @@ public class UserMenuPage extends JFrame {
     private StockDisplayPage stockPage;//0
     private UserStockPage userStockPage;//1
     private ManageAccountPage manageAccountPage;
+    private CustomerLogin customerLogin;
 
-    public UserMenuPage(StockController stockController, UserController userController, MessageController messageController) {
+    public UserMenuPage(CustomerLogin customerLogin, StockController stockController, UserController userController, MessageController messageController) {
+        this.customerLogin = customerLogin;
         stockPage = new StockDisplayPage(stockController, userController, this);
         userStockPage = new UserStockPage(stockController, userController, this);
         manageAccountPage = new ManageAccountPage(userController, this);
@@ -95,6 +98,18 @@ public class UserMenuPage extends JFrame {
         Thread thread = new Thread();
         updateMessageButton(messageController, messagesButton);
 
+        //logout button
+        JButton logoutButton = new JButton("Logout");
+        logoutButton.setPreferredSize(new Dimension(200, 50));
+        logoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                UserMenuPage.this.setVisible(false);
+                // 返回到登录页面的代码将在这里添加
+            }
+        });
+
+
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.insets = new Insets(0, 0, 0, 0);
@@ -107,6 +122,9 @@ public class UserMenuPage extends JFrame {
         add(manageAccountButton, gbc);
         gbc.gridy = 1;
         add(messagesButton, gbc);
+
+        gbc.gridy = 5;
+        add(logoutButton, gbc);
 
         getContentPane().setBackground(new Color(235, 235, 235));
         setLocationRelativeTo(null);
