@@ -74,6 +74,10 @@ public class ManagerLogin extends JPanel {
             ManagerFirstPage managerFirstPage = new ManagerFirstPage(userController);
             managerFirstPage.setVisible(true);
 
+            // Close the ManagerLogin page
+            JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(ManagerLogin.this);
+            frame.dispose();
+
         });
         add(loginButton, gbc);
 
