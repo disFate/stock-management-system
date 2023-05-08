@@ -86,6 +86,9 @@ public class CustomerLogin extends JPanel {
                         throw new RuntimeException(e);
                     }
                     userMenuPage.setVisible(true);
+                    // Close the CustomerLogin page
+                    JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(CustomerLogin.this);
+                    frame.dispose();
                 }
             });
 
