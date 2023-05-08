@@ -88,7 +88,7 @@ public class addEditDeleteStocks extends JFrame {
                     String symbol = (String) tableModel.getValueAt(selectedRow, 0);
 
                     BigDecimal bigDprice = (BigDecimal) tableModel.getValueAt(selectedRow, 2);
-                    double price = bigDprice.doubleValue();//(double) tableModel.getValueAt(selectedRow, 2);//bigDprice.doubleValue();
+                    //double price = bigDprice.doubleValue();//(double) tableModel.getValueAt(selectedRow, 2);//bigDprice.doubleValue();
                     int amount = (int) tableModel.getValueAt(selectedRow, 3);
 
                     // create the edit stock panel
@@ -100,7 +100,7 @@ public class addEditDeleteStocks extends JFrame {
                     JLabel companyLabel = new JLabel("Company:");
                     JTextField companyField = new JTextField(oldName);
                     JLabel priceLabel = new JLabel("Price:");
-                    JTextField priceField = new JTextField(Double.toString(price));
+                    JTextField priceField = new JTextField(bigDprice.toString());
                     JLabel amountLabel = new JLabel("Amount:");
                     JTextField amountField = new JTextField(Integer.toString(amount));
 
