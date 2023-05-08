@@ -3,6 +3,10 @@ package view.userPages;
 import controller.MessageController;
 import controller.StockController;
 import controller.UserController;
+import dao.impl.MessageDAOImpl;
+import dao.impl.StockDAOImpl;
+import dao.impl.TransactionDAOImpl;
+import dao.impl.UserDAOImpl;
 import model.Entity.Message;
 import model.Entity.User;
 import session.CurrentUser;
@@ -13,6 +17,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.List;
 
 public class UserMenuPage extends JFrame {
@@ -20,11 +26,14 @@ public class UserMenuPage extends JFrame {
     private UserStockPage userStockPage;//1
     private ManageAccountPage manageAccountPage;
 
+    private JButton messagesButton;
+    private MessageController messageController;
 
     public UserMenuPage(StockController stockController, UserController userController, MessageController messageController) {
         stockPage = new StockDisplayPage(stockController, userController, this);
         userStockPage = new UserStockPage(stockController, userController, this);
         manageAccountPage = new ManageAccountPage(userController, this);
+        this.messageController = messageController;
 
         setTitle("Customer Stock Trading System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -81,7 +90,7 @@ public class UserMenuPage extends JFrame {
             }
         });
 
-        JButton messagesButton = new JButton("Messages");
+        messagesButton = new JButton("Messages");
         messagesButton.setPreferredSize(new Dimension(200, 50));
         messagesButton.addActionListener(new ActionListener() {
             @Override
@@ -90,7 +99,7 @@ public class UserMenuPage extends JFrame {
             }
         });
         Thread thread = new Thread();
-        updateMessageButton(messageController, messagesButton);
+        updateMessageButton();
 
         //logout button
         JButton logoutButton = new JButton("Logout");
@@ -164,7 +173,7 @@ public class UserMenuPage extends JFrame {
                     if (!selectedMessage.isRead()) {
                         messageController.markMessageAsRead(selectedMessage.getId());
                         tableModel.setValueAt("read", selectedRow, 2);
-                        updateMessageButton(messageController, messagesButton); // Update message count on the message button
+                        updateMessageButton(); // Update message count on the message button
                     }
                 } else {
                     JOptionPane.showMessageDialog(null, "Please select a message to mark as read.");
@@ -178,29 +187,32 @@ public class UserMenuPage extends JFrame {
         messagesDialog.setVisible(true);
     }
 
-    public void updateMessageButton(MessageController messageController, JButton messageButton) {
+    public void updateMessageButton() {
         int unreadMessagesCount = messageController.getUnreadMessagesByUserId(CurrentUser.getCurrentUser().getId()).size();
         if (unreadMessagesCount > 0) {
-            messageButton.setText("Messages (" + unreadMessagesCount + ")");
+            messagesButton.setText("Messages (" + unreadMessagesCount + ")");
         } else {
-            messageButton.setText("Messages");
+            messagesButton.setText("Messages");
         }
     }
 
-//    public static void main(String[] args) {
-//        SwingUtilities.invokeLater(new Runnable() {
-//            @Override
-//            public void run() {
-//                UserMenuPage userMenuPage = null;
-//                try {
-//                    userMenuPage = new UserMenuPage(new StockController(new StockDAOImpl(), new TransactionDAOImpl()), new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl()), new MessageController(new MessageDAOImpl()));
-//                } catch (SQLException e) {
-//                    throw new RuntimeException(e);
-//                }
-//                userMenuPage.setVisible(true);
-//                UserController userController = new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl());
-//            }
-//        });
-//    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                UserMenuPage userMenuPage = null;
+                try {
+                    CurrentUser.setCurrentUser(new User(2, "tsuna", "tsuan@bu.edu", BigDecimal.valueOf(0)));
+                    userMenuPage = new UserMenuPage(new StockController(new StockDAOImpl(), new TransactionDAOImpl()), new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl()), new MessageController(new MessageDAOImpl()));
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                userMenuPage.setVisible(true);
+                UserController userController = new UserController(new UserDAOImpl(), new TransactionDAOImpl(), new StockDAOImpl());
+            }
+        });
+    }
+
 
 }

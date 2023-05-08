@@ -102,6 +102,7 @@ public class ManageAccountPage extends JFrame {
         backButton = new JButton("Back");
         leftPanel.add(backButton, BorderLayout.WEST);
         backButton.addActionListener(e -> {
+            userMenuPage.updateMessageButton();
             userMenuPage.setVisible(true);
             this.setVisible(false);
         });

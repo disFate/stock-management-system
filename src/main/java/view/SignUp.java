@@ -1,14 +1,12 @@
 package view;
 
+import controller.UserController;
+import model.Entity.User;
+import session.CurrentUser;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.math.BigDecimal;
-
-import controller.UserController;
-import model.Entity.*;
-import session.CurrentUser;
 
 public class SignUp extends JPanel {
     private JTextField userIdField;
@@ -71,7 +69,7 @@ public class SignUp extends JPanel {
         gbc.anchor = GridBagConstraints.CENTER;
         JButton signUpButton = new JButton("Sign Up");
         signUpButton.addActionListener(e -> {
-            signUp(mainPanel,userController);
+            signUp(mainPanel, userController);
         });
         add(signUpButton, gbc);
 
@@ -103,7 +101,7 @@ public class SignUp extends JPanel {
         }
 
         // Create new user
-        User user = new User(-1, name, email, password, User.Role.CUSTOMER, User.Approved.PENDING, BigDecimal.ZERO ,BigDecimal.ZERO);
+        User user = new User(-1, name, email, password, User.Role.CUSTOMER, User.Approved.REGISTERED, BigDecimal.ZERO, BigDecimal.ZERO);
 
         // Add user to database
         userController.addUser(user);

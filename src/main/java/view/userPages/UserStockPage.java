@@ -62,6 +62,7 @@ public class UserStockPage extends JFrame {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                userMenuPage.updateMessageButton();
                 userMenuPage.setVisible(true);
                 setVisible(false);
             }
