@@ -84,7 +84,7 @@ public class SignUp extends JPanel {
             emailField.setText("");
             passwordField.setText("");
             CardLayout layout = (CardLayout) mainPanel.getLayout();
-            layout.show(mainPanel, "Customer Login");
+            layout.show(mainPanel, "Welcome");
         });
         add(backButton, gbc);
     }
@@ -129,6 +129,9 @@ public class SignUp extends JPanel {
         // Switch to the UserProfile screen
         //CardLayout layout = (CardLayout) mainPanel.getLayout();
         //layout.show(mainPanel, "Customer Login");
+        nameField.setText("");
+        emailField.setText("");
+        passwordField.setText("");
 
         CardLayout layout = (CardLayout) mainPanel.getLayout();
         layout.show(mainPanel, "Home Page");

@@ -76,6 +76,8 @@ public class CustomerLogin extends JPanel {
             // Set current user
             CurrentUser.setCurrentUser(user);
             CustomerLogin customerLoginPage = this;
+
+
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -92,6 +94,8 @@ public class CustomerLogin extends JPanel {
                 }
             });
 
+            userIdField.setText("");
+            passwordField.setText("");
             // Add the UserMenuPage to the mainPanel
             //mainPanel.add(userMenuPage, "UserMenuPage");
 

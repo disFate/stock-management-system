@@ -78,6 +78,9 @@ public class ManagerLogin extends JPanel {
             JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(ManagerLogin.this);
             frame.dispose();
 
+            managerIdField.setText("");
+            passwordField.setText("");
+
         });
         add(loginButton, gbc);
 
