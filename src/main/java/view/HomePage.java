@@ -30,7 +30,7 @@ public class HomePage extends JFrame{
         mainPanel.add(welcomePanel, "Welcome");
 
         // Customer Login Panel
-        JPanel customerLoginPanel = new CustomerLogin(mainPanel, userController);
+        JPanel customerLoginPanel = new CustomerLogin(mainPanel, userController, false);
         mainPanel.add(customerLoginPanel, "Customer Login");
 
         // Manager Login Panel

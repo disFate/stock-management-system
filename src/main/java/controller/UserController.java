@@ -180,7 +180,7 @@ public class UserController {
 
     public boolean managerCheck() {
         List<User> managers = userDAO.getManager();
-        return managers.size() > 1;
+        return managers.size() > 0;
     }
 //    public
 }

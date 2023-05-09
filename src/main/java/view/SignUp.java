@@ -97,6 +97,8 @@ public class SignUp extends JPanel {
 
         // Check if user already exists
         if(isManager && userController.managerCheck()){
+            System.out.println(isManager);
+            System.out.println(userController.managerCheck());
             JOptionPane.showMessageDialog(this, "Manager already exists");
             return;
         }

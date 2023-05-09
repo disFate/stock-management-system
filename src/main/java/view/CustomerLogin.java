@@ -20,7 +20,7 @@ public class CustomerLogin extends JPanel {
     private UserController userController;
     private JPanel mainPanel;
 
-    public CustomerLogin(JPanel mainPanel, UserController userController) {
+    public CustomerLogin(JPanel mainPanel, UserController userController, Boolean isManager) {
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -111,19 +111,20 @@ public class CustomerLogin extends JPanel {
             Component[] components = mainPanel.getComponents();
             for (Component component : components) {
                 if (component instanceof SignUp) {
+                    // Create a new SignUp panel and add it to the mainPanel
+                    SignUp signUpPanel = new SignUp(mainPanel, userController, false);
+                    mainPanel.add(signUpPanel, "Customer Sign Up");
+
+                    // Switch to the SignUp screen
                     CardLayout layout = (CardLayout) mainPanel.getLayout();
-                    layout.show(mainPanel, "SignUp");
+                    layout.show(mainPanel, "Customer Sign Up");
+                    //CardLayout layout = (CardLayout) mainPanel.getLayout();
+                    //layout.show(mainPanel, "SignUp");
                     return;
                 }
             }
 
-            // Create a new SignUp panel and add it to the mainPanel
-            SignUp signUpPanel = new SignUp(mainPanel, userController, false);
-            mainPanel.add(signUpPanel, "SignUp");
 
-            // Switch to the SignUp screen
-            CardLayout layout = (CardLayout) mainPanel.getLayout();
-            layout.show(mainPanel, "SignUp");
         });
         add(signUpButton, gbc);
 
