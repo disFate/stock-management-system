@@ -77,6 +77,7 @@ public class UserDAOImpl implements IUserDAO {
         }
     }
 
+
     public List<User> getRegisteredUsers() {
         List<User> users = new ArrayList<>();
         String query = "SELECT * FROM users WHERE approved = 'approved' AND role = 'customer'";
@@ -283,6 +284,29 @@ public class UserDAOImpl implements IUserDAO {
     public List<User> getPendingUsers() {
         List<User> users = new ArrayList<>();
         String query = "SELECT * FROM users WHERE approved = 'pending' AND role = 'customer'";
+        try (Connection connection = DatabaseConnectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                String email = resultSet.getString("email");
+                BigDecimal balance = resultSet.getBigDecimal("balance");
+
+                User newUser = new User(id, name, email, balance);
+                users.add(newUser);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return users;
+    }
+
+
+    public List<User> getManager() {
+        List<User> users = new ArrayList<>();
+        String query = "SELECT * FROM users WHERE role = 'manager'";
         try (Connection connection = DatabaseConnectionPool.getConnection();
              PreparedStatement statement = connection.prepareStatement(query);) {
             ResultSet resultSet = statement.executeQuery();

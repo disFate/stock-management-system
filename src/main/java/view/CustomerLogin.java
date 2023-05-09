@@ -118,7 +118,7 @@ public class CustomerLogin extends JPanel {
             }
 
             // Create a new SignUp panel and add it to the mainPanel
-            SignUp signUpPanel = new SignUp(mainPanel, userController);
+            SignUp signUpPanel = new SignUp(mainPanel, userController, false);
             mainPanel.add(signUpPanel, "SignUp");
 
             // Switch to the SignUp screen

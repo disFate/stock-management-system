@@ -96,5 +96,30 @@ public class ManagerLogin extends JPanel {
             layout.show(mainPanel, "Welcome");
         });
         add(backButton, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        JButton signUpButton = new JButton("Sign Up");
+        signUpButton.addActionListener(e -> {
+            Component[] components = mainPanel.getComponents();
+            for (Component component : components) {
+                if (component instanceof SignUp) {
+                    CardLayout layout = (CardLayout) mainPanel.getLayout();
+                    layout.show(mainPanel, "SignUp");
+                    return;
+                }
+            }
+
+            // Create a new SignUp panel and add it to the mainPanel
+            SignUp signUpPanel = new SignUp(mainPanel, userController, true);
+            mainPanel.add(signUpPanel, "SignUp");
+
+            // Switch to the SignUp screen
+            CardLayout layout = (CardLayout) mainPanel.getLayout();
+            layout.show(mainPanel, "SignUp");
+        });
+        add(signUpButton, gbc);
     }
 }

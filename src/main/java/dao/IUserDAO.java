@@ -44,6 +44,8 @@ public interface IUserDAO {
 
     List<User> getPendingUsers();
 
+    List<User> getManager();
+
     public void startTransaction(Connection connection) throws SQLException;
 
     public void commitTransaction(Connection connection) throws SQLException;

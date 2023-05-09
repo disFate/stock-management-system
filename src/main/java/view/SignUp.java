@@ -7,6 +7,7 @@ import session.CurrentUser;
 import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
+import model.Entity.User.Role;
 
 public class SignUp extends JPanel {
     private JTextField userIdField;
@@ -14,7 +15,7 @@ public class SignUp extends JPanel {
     private JTextField emailField;
     private JPasswordField passwordField;
 
-    public SignUp(JPanel mainPanel, UserController userController) {
+    public SignUp(JPanel mainPanel, UserController userController, Boolean isManager) {
 
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -69,7 +70,7 @@ public class SignUp extends JPanel {
         gbc.anchor = GridBagConstraints.CENTER;
         JButton signUpButton = new JButton("Sign Up");
         signUpButton.addActionListener(e -> {
-            signUp(mainPanel, userController);
+            signUp(mainPanel, userController, isManager);
         });
         add(signUpButton, gbc);
 
@@ -79,29 +80,39 @@ public class SignUp extends JPanel {
         gbc.anchor = GridBagConstraints.CENTER;
         JButton backButton = new JButton("Back");
         backButton.addActionListener(e -> {
+            nameField.setText("");
+            emailField.setText("");
+            passwordField.setText("");
             CardLayout layout = (CardLayout) mainPanel.getLayout();
             layout.show(mainPanel, "Customer Login");
         });
         add(backButton, gbc);
     }
 
-    private void signUp(JPanel mainPanel, UserController userController) {
+    private void signUp(JPanel mainPanel, UserController userController, Boolean isManager) {
         //String userId = userIdField.getText();
         String name = nameField.getText();
         String email = emailField.getText();
         String password = new String(passwordField.getPassword());
 
         // Check if user already exists
-        //System.out.println(userController.getUserInfo(email).getName());
-        //System.out.println(userController.getUserInfo(email).getEmail());
-        //System.out.println(userController.getUserInfo(email).getPassword());
+        if(isManager && userController.managerCheck()){
+            JOptionPane.showMessageDialog(this, "Manager already exists");
+            return;
+        }
         if (userController.getUserInfo(email) != null) {
             JOptionPane.showMessageDialog(this, "User already exists");
             return;
         }
 
         // Create new user
-        User user = new User(-1, name, email, password, User.Role.CUSTOMER, User.Approved.REGISTERED, BigDecimal.ZERO, BigDecimal.ZERO);
+        Role r = null;
+        if(isManager){
+            r = Role.MANAGER;
+        }else{
+            r = Role.CUSTOMER;
+        }
+        User user = new User(-1, name, email, password, r, User.Approved.REGISTERED, BigDecimal.ZERO, BigDecimal.ZERO);
 
         // Add user to database
         userController.addUser(user);
@@ -118,6 +129,6 @@ public class SignUp extends JPanel {
         //layout.show(mainPanel, "Customer Login");
 
         CardLayout layout = (CardLayout) mainPanel.getLayout();
-        layout.show(mainPanel, "Customer Login");
+        layout.show(mainPanel, "Home Page");
     }
 }

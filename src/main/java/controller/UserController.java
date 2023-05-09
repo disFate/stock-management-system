@@ -177,5 +177,10 @@ public class UserController {
     public void addUser(User user) {
         userDAO.addUser(user);
     }
+
+    public boolean managerCheck() {
+        List<User> managers = userDAO.getManager();
+        return managers.size() > 1;
+    }
 //    public
 }

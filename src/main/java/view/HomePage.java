@@ -38,7 +38,7 @@ public class HomePage extends JFrame{
         mainPanel.add(managerLoginPanel, "Manager Login");
 
         // Manager Login Panel
-        JPanel SignUpPanel = new SignUp(mainPanel, userController);
+        JPanel SignUpPanel = new SignUp(mainPanel, userController, true);
         mainPanel.add(SignUpPanel, "SignUp");
 
         frame.getContentPane().add(mainPanel);
